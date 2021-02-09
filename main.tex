@@ -130,7 +130,7 @@ We may immediately see that all joint distributions $(X,Y)$ admit a sufficient s
 \begin{equation*}
     C_{Y|X} := \cap_{V: V\text{ sufficient}}V.
 \end{equation*}
-A variety of methods for estimation of the central subspace have been proposed. Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{Torkkola2003, Suzuki2008}, squared-loss mutual information \citep{Suzuki2010, Yamada2011}, or distance correlation \citep{Vepakomma2016}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{Cook2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{Ma2013} is also within our purview.\\
+A variety of methods for estimation of the central subspace have been proposed. Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{torkkola_feature_2003, suzuki_approximating_2008}, squared-loss mutual information \citep{suzuki_sufficient_2012, yamada_sufficient_2011}, or distance correlation \citep{vepakomma_supervised_2018}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{cook_dimension_2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{ma_estimation_2014} is also within our purview.\\
 
 - Dimensionality reduction via boosting? -\\
 
@@ -138,7 +138,7 @@ A variety of methods for estimation of the central subspace have been proposed. 
 
 
 \subsection{Random-projection ensemble classification}
-We now describe random-projection ensemble classification as proposed by \citet{Cannings2017}, a flexible tool which allows the use of a practitioner's favourite low-dimensional classifier. Random-projection ensemble classification will form the basis of our Let $X$ be a random vector taking values in $\mathcal{X} \subset \mathbb{R}^p$ from which we are attempting to predict a response $Y$ taking values in $\{0,1\}$. Furthermore suppose we are given $n$ observations of the pair, and denote our data $\mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We choose a $d$-dimensional base classifier $C$, and for any projection $A:\mathbb{R}^p \rightarrow \mathbb{R}^d$ denote by $C^A$ that classifier applied to the projected observations $AX$ (so the prediction $C^A(x) = C(Ax)$). We write $\mathcal{T}_n^A$ for the projected dataset $\{(Ax_1, y_1), (Ax_2, y_2), \dots, (Ax_n, y_n)\}$. Then we may let $C^A_{\mathcal{T}_n^A}$ denote the classifier trained on the projected dataset and acting as a classifier on $\mathbb{R}^p$. 
+We now describe random-projection ensemble classification as proposed by \citet{cannings_random-projection_2017}, a flexible tool which allows the use of a practitioner's favourite low-dimensional classifier. Random-projection ensemble classification will form the basis of our Let $X$ be a random vector taking values in $\mathcal{X} \subset \mathbb{R}^p$ from which we are attempting to predict a response $Y$ taking values in $\{0,1\}$. Furthermore suppose we are given $n$ observations of the pair, and denote our data $\mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We choose a $d$-dimensional base classifier $C$, and for any projection $A:\mathbb{R}^p \rightarrow \mathbb{R}^d$ denote by $C^A$ that classifier applied to the projected observations $AX$ (so the prediction $C^A(x) = C(Ax)$). We write $\mathcal{T}_n^A$ for the projected dataset $\{(Ax_1, y_1), (Ax_2, y_2), \dots, (Ax_n, y_n)\}$. Then we may let $C^A_{\mathcal{T}_n^A}$ denote the classifier trained on the projected dataset and acting as a classifier on $\mathbb{R}^p$. 
 
 We can now describe the random projection ensemble classifier with only one more ingredient: given a projection $A$, let $R^A_{\mathcal{T}_n}$ denote some estimate of the risk $R(C^A_{\mathcal{T}_n^A})$ of the classifier associated with the projection $A$. The procedure works by generating a set of random projections, and amongst those projections choosing the one for which the induced classifier performs best on the training data. This is repeated many times, and to classify an observation the decisions of each selected classifier are pooled. This is described in Algorithm \ref{alg:rpclass}.
 
@@ -312,7 +312,7 @@ Now we define a learned distance
 
 
 \bibliographystyle{plainnat}
-\bibliography{bib.bib}
+\bibliography{references.bib}
 
 
 \end{document}
