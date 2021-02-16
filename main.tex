@@ -31,7 +31,7 @@
 
 %\usepackage{comment}
 %\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models4[]}
-\usepackage[colorlinks,linkcolor=red,citecolor=blue,urlcolor=blue,breaklinks = true]{hyperref}
+\usepackage[colorlinks,linkcolor=black,citecolor=black,urlcolor=blue,breaklinks = true]{hyperref}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -90,9 +90,11 @@
 
 \newacronym{sdr}{SDR}{Supervised Dimensionality Reduction}
 
-\title{Algorithms for Supervised Dimensionality Reduction with Random Projection-Based Ensemble Learning}
+\title{Supervised Dimensionality Reduction with Random Projection-Based Ensemble Learning}
 \author{Jacob R. Bradley, Timothy I. Cannings}
 \date{}
+
+\setcitestyle{authoryear, open={(},close={)}}
 
 
 \begin{document}
@@ -126,7 +128,7 @@ Another broad class of dimensionality reduction techniques can be grouped under 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=4in]{ExampleFigures.png}
+\includegraphics[width=4in]{figures/ExampleFigures.png}
 \caption{Simple distributions that will provide a range of challenges to clustering and/or variable selection methods when embedded in higher dimensional space.\label{fig:examplefigures}}
 \end{figure}
 
@@ -262,19 +264,19 @@ where $\mathbf{\mu}_0 = (1, 0, \dots, 0)$, $\mathbf{\mu}_1 = (-1, 0, \dots, 0)$,
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.3in]{simpleboundary.png}
+        \includegraphics[height=2.3in]{figures/simpleboundary.png}
         \caption{The distribution of the two classes in the first two components. All other components are identically distributed between the two classes.\label{fig:simpleboundary}}
     \end{subfigure}%
     
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.3in]{simpleeigs.png}
+        \includegraphics[height=2.3in]{figures/simpleeigs.png}
         \caption{The sequence of average projection eigenvalues show a clear distinction for the very first basis vector.}
     \end{subfigure}
     ~ 
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.3in]{simplecomponents.png}
+        \includegraphics[height=2.3in]{figures/simplecomponents.png}
         \caption{Investigating the basis vector corresponding to the distinct eigenvalue shows a strong selection for the first component.}
     \end{subfigure}
 \caption{}
@@ -286,25 +288,25 @@ where $\mathbf{\mu}_0 = (1, 0, \dots, 0)$, $\mathbf{\mu}_1 = (-1, 0, \dots, 0)$,
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.2in]{complexboundary.png}
+        \includegraphics[height=2.2in]{figures/complexboundary.png}
         \caption{}
     \end{subfigure}%
     ~
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.2in]{complexeigs.png}
+        \includegraphics[height=2.2in]{figures/complexeigs.png}
         \caption{}
     \end{subfigure}
 
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.2in]{complexfirst.png}
+        \includegraphics[height=2.2in]{figures/complexfirst.png}
         \caption{}
     \end{subfigure}
     ~
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=2.2in]{complexsecond.png}
+        \includegraphics[height=2.2in]{figures/complexsecond.png}
         \caption{}
     \end{subfigure}
 \caption{}
