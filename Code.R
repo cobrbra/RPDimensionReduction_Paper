@@ -17,6 +17,7 @@ load_all("../../RPEnsemble/")
 
 
 ### Example Figure
+set.seed(1234)
 
 x0 <- data.frame(x = runif(n = 100, min = -.5, max = .5), y = runif(n = 100, min = -.5, max = 2), Label = factor(0, levels = 0:1))
 x1 <- data.frame(x = runif(n = 100, min = -.5, max = .5), y = runif(n = 100, min = -2, max = .5), Label = factor(1, levels = 0:1))
@@ -54,9 +55,10 @@ p4 <- ex4 %>%
 
 example_figure <- plot_grid(p1, p2, p3, p4, nrow = 2, labels = "AUTO")
 ggsave("figures/ExampleFigures.png", example_figure)
+
+
+
 ### Simulation Studies
-
-
 
 # Simulation parameters
 
