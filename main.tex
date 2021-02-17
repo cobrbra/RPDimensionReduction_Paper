@@ -127,28 +127,32 @@ Discovering a low-dimensional structure to a high-dimensional dataset is extreme
 Another broad class of dimensionality reduction techniques can be grouped under the banner of variable selection. These include methods based on model comparison statistics (e.g. Aikake Information Criterion, Bayesian Information Criterion), sparsity-enforcing regularisation (e.g. Lasso) and stability selection. These are, broadly speaking, motivated by the assumption that there exists some subset $S^* \subset \{1,\dots,p\}$ of the components of the input space $\mathcal{X}$ containing all available information about the labels. The output of such methods will typically be a set $\bar{S}$ estimating $S^*$. These methods perform well when the true lower-dimensional structure of the data aligns well with the axes of the observation space, but are not rotationally invariant. Lower dimensional structure along any other direction may not be well expressed via projection to some subset of axes, as illustrated in subplot $\textbf{C}$. This issue becomes more severe with higher dimensionality. Finally, both of the properties discussed may be true as illustrated in \textbf{D}. In this example, while a clear one dimensional structure exists, even embedded in two dimensions no combination of clustering and variable selection will provide a good lower-dimensional representation. 
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=4in]{figures/ExampleFigures.png}
-\caption{Simple distributions that will provide a range of challenges to clustering and/or variable selection methods when embedded in higher dimensional space.\label{fig:examplefigures}}
+    \centering
+    \includegraphics[width=4in]{figures/ExampleFigures.png}
+    \caption{\textbf{A}: Component-aligned, axis-aligned; \textbf{B}: Not component-aligned, axis-aligned;\textbf{C}: Component-aligned, not axis-aligned;\textbf{D}: Not component-aligned, not axis-aligned.\label{fig:examplefigures}}
 \end{figure}
 
 \subsection{Sufficient  and Central Subspaces}
 In order to address the issues established in the previous section, we seek a notion of dimensionality reduction that is \textit{a)} informed by labels as well as observations and \textit{b)} rotationally invariant. To this end we consider subspace selection as a generalisation of variable selection. Intuitively, we seek a low-dimensional subspace $V \subset \mathcal{X}$ such that almost all information pertaining to label value is encapsulated by an observation's projection onto $V$. If $V$ can be expressed as the span of canonical basis (i.e. axis-aligned) vectors, then this is equivalent to variable selection. 
 
 \begin{definition}
-\textit{Sufficient Subspace}: Given random variables $X$, $Y$ drawn from a joint distribution $P_{X\times Y}$ on $\mathcal{X} \times \mathcal{Y}$, we say that there exists a sufficient subspace of dimension $d$ if there exists a projection $A : \mathbb{R}^p \rightarrow \mathbb{R}^d $ such that 
-
-\[
-X \perp\!\!\!\perp Y\ | \ AX
-\]
-where $A$ being a projection mandates that $A {A}^T = I_d$. The sufficient subspace determined by $A$, which we denote $V(A)$, is given by the column space $\text{col}(A^TA)$.
+    \textit{Sufficient Subspace}: Given random variables $X$, $Y$ drawn from a joint distribution $P_{X\times Y}$ on $\mathcal{X} \times \mathcal{Y}$, we say that there exists a sufficient subspace of dimension $d$ if there exists a projection $A : \mathbb{R}^p \rightarrow \mathbb{R}^d $ such that 
+    
+    \[
+    X \perp\!\!\!\perp Y\ | \ AX
+    \]
+    
+    where $A$ being a projection mandates that $A {A}^T = I_d$. The sufficient subspace determined by $A$, which we denote $V(A)$, is given by the column space $\text{col}(A^TA)$.
 \end{definition}
+
 The notion of a sufficient subspace is a special case of the more general sufficient dimension reduction condition. This requires only a function $S:\mathbb{R}^p\rightarrow \mathbb{R}^d$ such that $X \perp\!\!\!\perp Y\ | \ S(X)$. A sufficient subspace exists if $S$ can be chosen to be linear. 
 
 We may immediately see that all joint distributions $(X,Y)$ admit a sufficient subspace (namely via the identity map $A= I_p$). Furthermore, any superspace $W \supseteq V$ of a sufficient subspace $V$ is also sufficient. While it is not necessarily true that the intersection $V_1 \cap V_2$ of two sufficient subspaces $V_1,V_2$ is itself sufficient, \citet[Lemma 2]{cook_graphics_1996} laid out conditions under which this is the case which are broad enough for our purposes. Under such circumstances it makes sense to discuss the central subspace 
+
 \begin{equation*}
     C_{Y|X} := \cap_{V: V\text{ sufficient}}V.
 \end{equation*}
+
 A variety of methods for estimation of the central subspace have been proposed. Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{torkkola_feature_2003, suzuki_approximating_2008}, squared-loss mutual information \citep{suzuki_sufficient_2012, yamada_sufficient_2011}, or distance correlation \citep{vepakomma_supervised_2018}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{cook_dimension_2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{ma_estimation_2014} is also within our purview.\\
 
 - Dimensionality reduction via boosting? -\\
