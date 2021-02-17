@@ -252,8 +252,10 @@ $$\frac{1}{2\sigma}||A(\mu_1 - \mu_0)|^2 - |A^*(\mu_1 - \mu_0)|^2|\phi(\frac{1}{
 Rearranging and noting that $A^* = (\mu_1 - \mu_0)/|\mu_1 - \mu_0|$ (up to sign), we can say if given a bound of the form $R(C^{A-\mathrm{Bayes}}) - R(C^{A^*-\mathrm{Bayes}}) < \varepsilon$ that 
 $$|A{A^*}^T| \geq \sqrt{1 - \varepsilon \frac{2\sqrt{2\pi}\sigma\exp(\frac{1}{4\sigma^2}|\mu_1 - \mu_0|^4)}{|\mu_1 - \mu_0|^2}}. $$
 We notice here that the bound grows weak quickly as the distance between $\mu_0$ and $\mu_1$ increases. This stands to reason, since when signal is clearer projections a long way from optimal may produce good classifiers. The 
+
 \section{Simulations}
-\subsection{Case 1: Simple Separation}
+
+\subsection{Sparse class boundaries}
 We consider the setup
 $$X\ | \ Y = 0 \sim N_p(\mathbf{\mu}_0, \Sigma_0) $$
 $$X\ | \ Y= 1 \sim N_p(\mathbf{\mu}_1, \Sigma_1) $$
@@ -283,7 +285,8 @@ where $\mathbf{\mu}_0 = (1, 0, \dots, 0)$, $\mathbf{\mu}_1 = (-1, 0, \dots, 0)$,
 \end{figure*}
 
 
-\subsection{Case 2: Complex Separation}
+\subsection{Rotated sparse normal}
+
 \begin{figure*}[t!]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
@@ -311,7 +314,13 @@ where $\mathbf{\mu}_0 = (1, 0, \dots, 0)$, $\mathbf{\mu}_1 = (-1, 0, \dots, 0)$,
     \end{subfigure}
 \caption{}
 \end{figure*}
+
+\subsection{Independent features}
+
+\subsection{$t$‐distributed features}
+
 \section{Real-World Examples}
+
 \subsection{Epilepsy Dataset}
 
 
