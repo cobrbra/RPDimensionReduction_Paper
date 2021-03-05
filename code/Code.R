@@ -66,8 +66,8 @@ set.seed(1234)
 
 p <- 100
 
-n_train <- 1000
-n_val <- 0
+n_train <- 500
+n_val <- 500
 n_test <- 500
 
 
@@ -75,16 +75,19 @@ n_test <- 500
 ids <- tvt(n_train, n_val, n_test)
 
 # Simulation model 1
-simulated_data_1 <- RPModel(1, n = n_train + n_test, p = p)
+simulated_data_1 <- RPModel(1, n = n_train + n_val + n_test, p = p)
 
 XTrain_1 <- simulated_data_1$x[ids$train, ]
 YTrain_1 <- simulated_data_1$y[ids$train]
+
+XVal_1 <- simulated_data_1$x[ids$val, ]
+YVal_1 <- simulated_data_1$y[ids$val]
 
 XTest_1 <- simulated_data_1$x[ids$test, ]
 YTest_1 <- simulated_data_1$y[ids$test]
 
 
-decompose_1 <- RPDecomposeA(XTrain = XTrain_1, YTrain = YTrain_1, B1 = 1000, B2 = 10, d = 3, base = "knn", estmethod = "loo")
+decompose_1 <- RPDecomposeA(XTrain = XTrain_1, YTrain = YTrain_1, XVal = XVal_1, YVal = YVal_1, B1 = 1000, B2 = 10, d = 3, base = "knn", estmethod = "loo")
 reduce_1 <- RPReduce(XTrain = XTrain_1, YTrain = YTrain_1, reduced_dim = 2, XTest = XTest_1, YTest = YTest_1, d = 2, decomposition = decompose_1) %>% 
   mutate(Model = 1)
 
