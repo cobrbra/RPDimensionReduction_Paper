@@ -155,6 +155,8 @@ We may immediately see that all joint distributions $(X,Y)$ admit a sufficient s
 
 A variety of methods for estimation of the central subspace have been proposed. Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{torkkola_feature_2003, suzuki_approximating_2008}, squared-loss mutual information \citep{suzuki_sufficient_2012, yamada_sufficient_2011}, or distance correlation \citep{vepakomma_supervised_2018}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{cook_dimension_2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{ma_estimation_2014} is also within our purview.\\
 
+- Sliced Inverse Regression(!) \\
+
 - Dimensionality reduction via boosting? -\\
 
 \subsection{False discovery and power for dimension reduction}
@@ -274,31 +276,20 @@ We notice here that the bound grows weak quickly as the distance between $\mu_0$
 
 \begin{figure}
     \centering
-    \includegraphics[width=6in]{figures/sim_evs.png}
+    \includegraphics[width=4in]{figures/sim_evs.png}
     \caption{Caption}
-    \label{fig:sim1_ev}
+    \label{fig:sim_evs}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=4in]{figures/sim_rvs.png}
+    \caption{Caption}
+    \label{fig:sim_rvs}
+\end{figure}
 
 \section{Real-World Examples}
 
-
-\subsection{Epilepsy Dataset}
-
-
-% \section{Generalised formulation?}
-% If we made good progress on the techniques that we've got at the moment, I think there would be scope for looking at a range of generalisations. These can be grouped into alterations of the selection method for choosing random projections, and alterations of the distance measure used to obtain low-dimensional representations. Consider the following (very general) setup, where we have a few objects:
-% \begin{itemize}
-%     \item A training set $\mathcal{T}_n$.
-%     \item A collection of projections $\mathcal{A} := \{ A_b \in \mathbb{R}^{d\times p} : b \in \{ 1,\dots,B\}$ (by projections we mean that for all $b$, $A_bA_b^T = I_d$).
-%     \item A base classifier, i.e. a map $C : (\mathcal{T}_n, A) \mapsto C^A_{\mathcal{T}_n}$ where $C^A_{\mathcal{T}_n}$ is a function $C^A_{\mathcal{T}_n}: \mathcal{X} \rightarrow \mathcal{Y}$.
-%     \item A selection procedure, by which we mean a map $s : (\mathcal{T}_n, \mathcal{A}, b, C) \mapsto s_b$ where $s_b:\mathcal{X}^2 \rightarrow \{0,1\}$ is a function detailing which pairs of observations to select that projection for. 
-%     \item A positive definite kernel $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$.
-% \end{itemize}
-
-% Now we define a learned distance 
-
-% \[K^\mathcal{A}_{\mathcal{T}_n}(x,x') = \sum_{b: s_b(x,x') = 1} k(A_bx, A_bx').\]
 
 \section*{Appendix}
 
