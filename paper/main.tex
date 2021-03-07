@@ -160,8 +160,11 @@ A variety of methods for estimation of the central subspace have been proposed. 
 - Dimensionality reduction via boosting? -\\
 
 \subsection{False discovery and power for dimension reduction}
-\citep{taeb_false_2020}
-
+We use the definitions from \citet{taeb_false_2020} of false discovery and power for subspace discovery. In particular, given a target subspace $S^* \subset \mathbb{R}^p$, and an estimate subspace $\hat{S}$, we let the false discovery $FD$ be given by 
+\[FD = \mathrm{Trace} \big( (I_p - \Pi_{S^*})\Pi_{\hat{S}} \big) \]
+and power
+\[PW = \mathrm{Trace} \big( \Pi_{S^*} \Pi_{\hat{S}} \big). \]
+Here, $\Pi_{S^*}, \Pi_{\hat{S}}$ refer to projections onto $S^*$ and $\hat{S}$ respectively. 
 \subsection{Random-projection ensemble classification}
 We now describe random-projection ensemble classification as proposed by \citet{cannings_random-projection_2017}, a flexible tool which allows the use of a practitioner's favourite low-dimensional classifier. Random-projection ensemble classification will form the basis of our Let $X$ be a random vector taking values in $\mathcal{X} \subset \mathbb{R}^p$ from which we are attempting to predict a response $Y$ taking values in $\{0,1\}$. Furthermore suppose we are given $n$ observations of the pair, and denote our data $\mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We choose a $d$-dimensional base classifier $C$, and for any projection $A:\mathbb{R}^p \rightarrow \mathbb{R}^d$ denote by $C^A$ that classifier applied to the projected observations $AX$ (so the prediction $C^A(x) = C(Ax)$). We write $\mathcal{T}_n^A$ for the projected dataset $\{(Ax_1, y_1), (Ax_2, y_2), \dots, (Ax_n, y_n)\}$. Then we may let $C^A_{\mathcal{T}_n^A}$ denote the classifier trained on the projected dataset and acting as a classifier on $\mathbb{R}^p$. 
 
@@ -260,7 +263,7 @@ $$|A{A^*}^T| \geq \sqrt{1 - \varepsilon \frac{2\sqrt{2\pi}\sigma\exp(\frac{1}{4\
 We notice here that the bound grows weak quickly as the distance between $\mu_0$ and $\mu_1$ increases. This stands to reason, since when signal is clearer projections a long way from optimal may produce good classifiers. The 
 
 \section{Simulations}
-
+We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. 
 \subsection{Sparse class boundaries}
 Here we let 
 \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
@@ -280,7 +283,14 @@ Here,
     \centering
     \includegraphics[width=6in]{../results/figures/sim_evs.png}
     \caption{Caption}
-    \label{fig:sim1_ev}
+    \label{fig:sim_evs}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=6in]{../results/figures/sim_rvs.png}
+    \caption{Caption}
+    \label{fig:sim_rvs}
 \end{figure}
 
 
