@@ -26,6 +26,7 @@
 \usepackage{graphics}
 \usepackage{psfrag}
 \usepackage{caption, subcaption}
+\usepackage{booktabs}
 %\usepackage{algorithm}
 \usepackage[ruled,vlined]{algorithm2e}
 
@@ -276,8 +277,32 @@ We present two simulation studies, of distributions with known central subspaces
 First, we let 
 \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
 \[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma). \]
-We set $p=100$, $\mu_0 = (1/\sqrt{2}, -1/\sqrt{2}, 0, \ldots, 0)^T$, $\mu_1 = (1/\sqrt{2}, 1/\sqrt{2}, 0, \ldots, 0)^T$ and let $\Sigma$ be a diagonal with $\Sigma_{11} = \Sigma_{22} = 1/\sqrt{2}$ and $\Sigma_{jj} = 1$ for $j>2$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary and the dimensions of interest are not necessarily the dimensions of greatest variance. \\
+We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)^T$ and let $\Sigma = I_{100}$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary. \\
 ~\\
+
+\begin{table}
+  \caption{Simulation performance}
+  \label{sample-table}
+  \centering
+  \begin{tabular}{l|lll|lll}
+    \toprule
+    \multicolumn{2}{c}{Model 1} & \multicolumn{2}{c}{Model 2}                     \\
+    \cmidrule(r){1-4}
+    Method     & Power     & False & Accuracy &  Power     & False & Accuracy &  \\
+    & & Discovery & & & Discovery &
+    \midrule
+    RP-LDA & Input terminal  & $\sim$100  &  &&& \\
+    RP-QDA    & Output terminal & $\sim$10    &  &&&\\
+    RP-kNN     & Cell body       & up to $10^6$ & &&& \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% First, we let 
+% \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
+% \[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma). \]
+% We set $p=100$, $\mu_0 = (1/\sqrt{2}, -1/\sqrt{2}, 0, \ldots, 0)^T$, $\mu_1 = (1/\sqrt{2}, 1/\sqrt{2}, 0, \ldots, 0)^T$ and let $\Sigma$ be a diagonal with $\Sigma_{11} = \Sigma_{22} = 1/\sqrt{2}$ and $\Sigma_{jj} = 1$ for $j>2$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary and the dimensions of interest are not necessarily the dimensions of greatest variance. \\
+% ~\\
 
 
 \textbf{Rotated sparse normal}\\
