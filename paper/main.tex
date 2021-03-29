@@ -26,6 +26,7 @@
 \usepackage{graphics}
 \usepackage{psfrag}
 \usepackage{caption, subcaption}
+\usepackage{booktabs}
 %\usepackage{algorithm}
 \usepackage[ruled,vlined]{algorithm2e}
 
@@ -129,7 +130,7 @@ Another broad class of dimensionality reduction techniques can be grouped under 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=4in]{../results/figures/ExampleFigures.png}
-    \caption{\textbf{A}: Component-aligned, axis-aligned; \textbf{B}: Not component-aligned, axis-aligned;\textbf{C}: Component-aligned, not axis-aligned;\textbf{D}: Not component-aligned, not axis-aligned.\label{fig:examplefigures}}
+    \caption{\textbf{A}: Component-aligned, axis-aligned; \textbf{B}: Not component-aligned, axis-aligned; \textbf{C}: Component-aligned, not axis-aligned; \textbf{D}: Not component-aligned, not axis-aligned.\label{fig:examplefigures}}
 \end{figure}
 
 \subsection{Sufficient  and Central Subspaces}
@@ -153,9 +154,13 @@ We may immediately see that all joint distributions $(X,Y)$ admit a sufficient s
     C_{Y|X} := \cap_{V: V\text{ sufficient}}V.
 \end{equation*}
 
-A variety of methods for estimation of the central subspace have been proposed. Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{torkkola_feature_2003, suzuki_approximating_2008}, squared-loss mutual information \citep{suzuki_sufficient_2012, yamada_sufficient_2011}, or distance correlation \citep{vepakomma_supervised_2018}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{cook_dimension_2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{ma_estimation_2014} is also within our purview.\\
+A variety of methods for estimation of the central subspace have been proposed. Those based on the notion of inverse regression include  Several have proceeded by maximising an estimate of the dependence between $AX$ and $Y$, where the dependence is measured by log-loss mutual information \citep{torkkola_feature_2003, suzuki_approximating_2008}, squared-loss mutual information \citep{suzuki_sufficient_2012, yamada_sufficient_2011}, or distance correlation \citep{vepakomma_supervised_2018}. Related to the notion of the central subspace is that of the central mean subspace,introduced in \citet{cook_dimension_2002} along with a discussion of methods for its estimation. In the case of binary classification, which we will consider, the central subspace and central mean subspace are equivalent. Therefore, work geared towards estimation of the central mean subspace \citep[see for example][]{ma_estimation_2014} is also within our purview.\\
 
-- Sliced Inverse Regression(!) -\\
+- Sliced Inverse Regression (SIR) \citep{li_sliced_1991}\\
+
+- Sliced average variance estimation (SAVE) \citep{cook_save_2000}. \\
+
+- Principal Hessian Directions (PHD) \citep{li_principal_1992} \\
 
 - Dimensionality reduction via boosting? -\\
 
@@ -244,39 +249,69 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
 
 \citep{paulin_efronstein_2016}
 
-\subsection{Naive LDA }
-\tcnote{write out Linear Discriminant Analysis (and why naive?)}
-Suppose an LDA separation with independent covariates:
-$$X\ | \ Y = 0 \sim N_p(\mathbf{\mu}_0, \sigma^2 I_p) $$
-$$X\ | \ Y= 1 \sim N_p(\mathbf{\mu}_1,  \sigma^2 I_p) $$
+% \subsection{Naive LDA }
+% \tcnote{write out Linear Discriminant Analysis (and why naive?)}
+% Suppose an LDA separation with independent covariates:
+% $$X\ | \ Y = 0 \sim N_p(\mathbf{\mu}_0, \sigma^2 I_p) $$
+% $$X\ | \ Y= 1 \sim N_p(\mathbf{\mu}_1,  \sigma^2 I_p) $$
 
-and further suppose that the classes are balanced ($\pi_0 = \pi_1 = \frac{1}{2}$). We have that the risk of the Bayes decision classifier $C^{A-\mathrm{Bayes}}$ for the projected data $AX$ has a boundary given by $\eta(\mathbf{x}) = 0$ where the function $\eta$ is
-$$\eta(\mathbf{x}) = (A\mathbf{x} - \frac{A\mathbf{\mu}_0 + A\mathbf{\mu}_1}{2})^T(A\mu_1 - A\mu_0).$$
-We also have that the risk is given by 
-$$R(C^{A-\mathrm{Bayes}}) = 1 - \Phi(\frac{1}{2\sigma}(\mu_1 - \mu_0)^TA^TA(\mu_1 - \mu_0)).$$
-We can then investigate the quantity 
-$$R(C^{A-\mathrm{Bayes}}) - R(C^{A^*-\mathrm{Bayes}}) = \Phi (\frac{1}{2\sigma} |A^*(\mu_1 - \mu_0)|^2) - \Phi(\frac{1}{2\sigma}(|A(\mu_1-\mu_0)|^2),$$
-which is bounded below by 
-$$\frac{1}{2\sigma}||A(\mu_1 - \mu_0)|^2 - |A^*(\mu_1 - \mu_0)|^2|\phi(\frac{1}{2\sigma}|A^*(\mu_1 - \mu_0)|^2). $$
-Rearranging and noting that $A^* = (\mu_1 - \mu_0)/|\mu_1 - \mu_0|$ (up to sign), we can say if given a bound of the form $R(C^{A-\mathrm{Bayes}}) - R(C^{A^*-\mathrm{Bayes}}) < \varepsilon$ that 
-$$|A{A^*}^T| \geq \sqrt{1 - \varepsilon \frac{2\sqrt{2\pi}\sigma\exp(\frac{1}{4\sigma^2}|\mu_1 - \mu_0|^4)}{|\mu_1 - \mu_0|^2}}. $$
-We notice here that the bound grows weak quickly as the distance between $\mu_0$ and $\mu_1$ increases. This stands to reason, since when signal is clearer projections a long way from optimal may produce good classifiers. The 
+% and further suppose that the classes are balanced ($\pi_0 = \pi_1 = \frac{1}{2}$). We have that the risk of the Bayes decision classifier $C^{A-\mathrm{Bayes}}$ for the projected data $AX$ has a boundary given by $\eta(\mathbf{x}) = 0$ where the function $\eta$ is
+% $$\eta(\mathbf{x}) = (A\mathbf{x} - \frac{A\mathbf{\mu}_0 + A\mathbf{\mu}_1}{2})^T(A\mu_1 - A\mu_0).$$
+% We also have that the risk is given by 
+% $$R(C^{A-\mathrm{Bayes}}) = 1 - \Phi(\frac{1}{2\sigma}(\mu_1 - \mu_0)^TA^TA(\mu_1 - \mu_0)).$$
+% We can then investigate the quantity 
+% $$R(C^{A-\mathrm{Bayes}}) - R(C^{A^*-\mathrm{Bayes}}) = \Phi (\frac{1}{2\sigma} |A^*(\mu_1 - \mu_0)|^2) - \Phi(\frac{1}{2\sigma}(|A(\mu_1-\mu_0)|^2),$$
+% which is bounded below by 
+% $$\frac{1}{2\sigma}||A(\mu_1 - \mu_0)|^2 - |A^*(\mu_1 - \mu_0)|^2|\phi(\frac{1}{2\sigma}|A^*(\mu_1 - \mu_0)|^2). $$
+% Rearranging and noting that $A^* = (\mu_1 - \mu_0)/|\mu_1 - \mu_0|$ (up to sign), we can say if given a bound of the form $R(C^{A-\mathrm{Bayes}}) - R(C^{A^*-\mathrm{Bayes}}) < \varepsilon$ that 
+% $$|A{A^*}^T| \geq \sqrt{1 - \varepsilon \frac{2\sqrt{2\pi}\sigma\exp(\frac{1}{4\sigma^2}|\mu_1 - \mu_0|^4)}{|\mu_1 - \mu_0|^2}}. $$
+% We notice here that the bound grows weak quickly as the distance between $\mu_0$ and $\mu_1$ increases. This stands to reason, since when signal is clearer projections a long way from optimal may produce good classifiers. The 
 
 \section{Simulations}
-We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. 
-\subsection{Sparse class boundaries}
-Here we let 
+
+\subsection{Known Subspace Dimension}
+
+We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. \\
+~\\
+\textbf{Sparse class boundaries}\\
+First, we let 
 \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
-\[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma) \]
+\[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma). \]
+We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)^T$ and let $\Sigma = I_{100}$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary. \\
+~\\
+
+\begin{table}
+  \caption{Simulation performance}
+  \label{sample-table}
+  \centering
+  \begin{tabular}{l|lll|lll}
+    \toprule
+    \multicolumn{2}{c}{Model 1} & \multicolumn{2}{c}{Model 2}                     \\
+    \cmidrule(r){1-4}
+    Method     & Power     & False & Accuracy &  Power     & False & Accuracy &  \\
+    & & Discovery & & & Discovery &
+    \midrule
+    RP-LDA & Input terminal  & $\sim$100  &  &&& \\
+    RP-QDA    & Output terminal & $\sim$10    &  &&&\\
+    RP-kNN     & Cell body       & up to $10^6$ & &&& \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% First, we let 
+% \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
+% \[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma). \]
+% We set $p=100$, $\mu_0 = (1/\sqrt{2}, -1/\sqrt{2}, 0, \ldots, 0)^T$, $\mu_1 = (1/\sqrt{2}, 1/\sqrt{2}, 0, \ldots, 0)^T$ and let $\Sigma$ be a diagonal with $\Sigma_{11} = \Sigma_{22} = 1/\sqrt{2}$ and $\Sigma_{jj} = 1$ for $j>2$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary and the dimensions of interest are not necessarily the dimensions of greatest variance. \\
+% ~\\
 
 
-
-\subsection{Rotated sparse normal}
+\textbf{Rotated sparse normal}\\
 Here,
 
 \[X \ | \ \{Y = 0\} \sim N_p(\Omega_p\mu_0, \Omega_p \Sigma_0 \Omega_p^T)  \] 
-\[X \ | \ \{Y = 1\} \sim N_p(\Omega_p\mu_1, \Omega_p\Sigma_1\Omega_p^T)  \]
+\[X \ | \ \{Y = 1\} \sim N_p(\Omega_p\mu_1, \Omega_p\Sigma_1\Omega_p^T),  \]
 
+where $\Sigma_p$ is a random $p\times p$ rotation. We choose $\mu_0 = (3, 3, 3, 0, \ldots, 0)$ and $\mu_1 = (0, \ldots, 0)$, while $\Sigma0$ and $\Sigma_1$ are block diagonal
 
 
 \begin{figure}
@@ -292,6 +327,8 @@ Here,
     \caption{Caption}
     \label{fig:sim_rvs}
 \end{figure}
+
+\subsection{Unknown Subspace Dimension}
 
 
 \section{Real-World Examples}
