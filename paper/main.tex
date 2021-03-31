@@ -219,6 +219,11 @@ Recall that each of $A_{1}, \ldots, A_{B_1}$ were selected from groups of indepe
 \[
 \bar{\Pi} := \frac{1}{B_1} \sum_{b_1 = 1}^{B_1} \Pi_{b_1} =  \frac{1}{B_1} \sum_{b_1=1}^{B_1} A_{b_1}^TA_{b_1}.
 \]
+\tcnote{Compare with: 
+\[
+\Bigl(\bar{\Pi} -\mathbb{E}(A^TA) \Bigr)^2 =  \Bigl(\bar{\Pi} - \frac{d}{p} I_{p\times p}\Bigr)^2
+\]
+This gave us the same answer, right?}
 
 Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it is symmetric since each of the terms in the sum which defines it are symmetric. Thus it admits an eigenvalue decomposition $\Pi = V\Lambda V^T$. Letting $\mathbf{v}_i$ be the $i$th column vector of $V$ and considering the action of $\Pi$ on an arbitrary vector $\mathbf{w}$, we have $\Pi\mathbf{w} = \sum_{i=1}^{p} \lambda_i (\mathbf{w \cdot v}_i) \mathbf{v}_i$, so we see that applying $\Pi$ corresponds to projecting onto each of the $\mathbf{v}_i$s with weighting $\lambda_i$. Therefore the vector $\mathbf{v}_1$ will correspond to the direction most strongly selected for in the RP construction, with each subsequent $\mathbf{v}_i$ the most strongly selected direction in the remaining orthogonal space. It is these directions which we hope to use to estimate close-to-sufficient subspaces of arbitrary dimension. The process described above is encapsulated more formally in Algorithm \ref{alg:rpsubspace}.
 
@@ -271,6 +276,8 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
 
 \subsection{Known Subspace Dimension}
 
+
+\jbnote{Power $\rightarrow$ power rate, accuracy $\rightarrow$ accuracy + bayes risk}
 We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. \\
 ~\\
 \textbf{Sparse class boundaries}\\
@@ -286,17 +293,23 @@ We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)
   \centering
   \begin{tabular}{l|lll|lll}
     \toprule
-    \multicolumn{2}{c}{Model 1} & \multicolumn{2}{c}{Model 2}                     \\
-    \cmidrule(r){1-4}
-    Method     & Power     & False & Accuracy &  Power     & False & Accuracy &  \\
-    & & Discovery & & & Discovery &
+    & \multicolumn{3}{c}{Model 1} & \multicolumn{3}{c}{Model 2}                     \\
+    \cmidrule(r){1-7}
+    Method     & Power     & FD & Accuracy &  Power     & FD & Accuracy   \\
+   
     \midrule
-    RP-LDA & Input terminal  & $\sim$100  &  &&& \\
-    RP-QDA    & Output terminal & $\sim$10    &  &&&\\
-    RP-kNN     & Cell body       & up to $10^6$ & &&& \\
+    RP-LDA & 0.185 & 1.82  &  0.553 & 0.897 & 1.10 & 0.945 \\
+    RP-QDA & 1.65  & 0.350 & 0.899 & 0.902 & 1.10 & 0.945 \\
+    RP-kNN & 1.58  & 0.417 & 0.908 & 0.938 & 1.06 & 0.945 \\
+    SIR & 0.417 & 1.58 & 0.539 & 0.677 & 1.32 & 0.945 \\
+    SAVE & 1.42 & 0.575 & 0.882 & 1.07 & 0.931 & 0.931 \\
+    PHD & 1.23 & 0.765 & 0.867 & 0.0352 & 1.96 & 0.465 \\
+    PCA & 1.94 & 0.0593 & 0.93 & 0.997 & 1.00 & 0.940 \\
+    Lt-SNE & 0.0137 & 1.986 & 0.477 & 0.0589 & 1.94 & 0.581 \\
     \bottomrule
   \end{tabular}
 \end{table}
+
 
 % First, we let 
 % \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
@@ -311,7 +324,7 @@ Here,
 \[X \ | \ \{Y = 0\} \sim N_p(\Omega_p\mu_0, \Omega_p \Sigma_0 \Omega_p^T)  \] 
 \[X \ | \ \{Y = 1\} \sim N_p(\Omega_p\mu_1, \Omega_p\Sigma_1\Omega_p^T),  \]
 
-where $\Sigma_p$ is a random $p\times p$ rotation. We choose $\mu_0 = (3, 3, 3, 0, \ldots, 0)$ and $\mu_1 = (0, \ldots, 0)$, while $\Sigma0$ and $\Sigma_1$ are block diagonal
+where $\Sigma_p$ is a random $p\times p$ rotation. We choose $\mu_0 = (3, 3, 3, 0, \ldots, 0)$ and $\mu_1 = (0, \ldots, 0)$, while $\Sigma_0$ and $\Sigma_1$ are block diagonal
 
 
 \begin{figure}
