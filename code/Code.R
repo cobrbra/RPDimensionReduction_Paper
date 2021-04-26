@@ -99,6 +99,34 @@ YTest_1 <- simulated_data_1$data$y[ids$test]
 
 train_val_data_1 <- data.frame(cbind(rbind(XTrain_1, XVal_1), Y = c(YTrain_1, YVal_1)))
 
+
+
+#####
+
+plot(colMeans(XTrain_1[YTrain_1 == 1, ]), col = c("green", rep("blue", 99)))
+plot(colMeans(XTrain_1[YTrain_1 == 2, ]), col = c("green", rep("blue", 99)))
+
+f_1 <- sum(YTrain_1 == 1)
+f_2 <- sum(YTrain_1 == 2)
+
+M <- f_1 * cov(XTrain_1[YTrain_1 == 1, ]) + f_2 * cov(XTrain_1[YTrain_1 == 2, ])
+vecs <- eigen(M)$vectors
+
+plot(vecs[, 1])
+plot(vecs[, 2])
+
+sirrr <- dr(data = as.data.frame(cbind(XTrain_1, Y = YTrain_1)), formula = as.formula(paste("Y ~ ", paste0("V", 1:100, collapse = "+"))), method = "sir", nslices = 2)
+plot(sirrr$evectors[, 1])
+plot(sirrr$evectors[, 2])
+
+plot(sirrr$evalues)
+
+#####
+
+
+
+
+
 # RPEnsemble Method: LDA
 decompose_lda_1 <- RPDecomposeA(XTrain = XTrain_1, YTrain = YTrain_1, XVal = XVal_1, YVal = YVal_1, B1 = 500, B2 = 50, d = 2, base = "LDA", estmethod = "samplesplit")
 

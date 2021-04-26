@@ -23,10 +23,12 @@ ids <- tvt(n_train, n_val, n_test)
 ## Simulation model 1
 # Simulate data (with normalisation on first two covariates)
 simulated_data_1 <- RPModel(1, n = n_train + n_val + n_test, p = p) 
+simulated_data_1_unscaled <- simulated_data_1
 simulated_data_1$data$x[, 1:2] <- (1/sqrt(5)) * simulated_data_1$data$x[, 1:2]
 
 XTrain_1 <- simulated_data_1$data$x[ids$train, ]
 YTrain_1 <- simulated_data_1$data$y[ids$train]
+XTrain_1_unscaled <- simulated_data_1_unscaled$data$x[ids$train, ]
 
 XVal_1 <- simulated_data_1$data$x[ids$val, ]
 YVal_1 <- simulated_data_1$data$y[ids$val]
@@ -35,6 +37,54 @@ XTest_1 <- simulated_data_1$data$x[ids$test, ]
 YTest_1 <- simulated_data_1$data$y[ids$test]
 
 train_val_data_1 <- data.frame(cbind(rbind(XTrain_1, XVal_1), Y = c(YTrain_1, YVal_1)))
+
+
+#######
+
+d <- 3
+B1 <- 1
+B2 <- 5000
+
+set.seed(1234)
+rp_knn_A <- RPChooseSSA(XTrain = XTrain_1, 
+                        YTrain = YTrain_1,
+                        XVal = XVal_1,
+                        YVal = YVal_1,
+                        d = d,
+                        B2 = B2,
+                        base = "knn")
+
+set.seed(1234)
+rp_knn_out <- RPParallel(XTrain = XTrain_1, 
+                         YTrain = YTrain_1, 
+                         XVal = XVal_1, 
+                         YVal = YVal_1,
+                         XTest = XTest_1, 
+                         d = d, 
+                         B1 = B1, 
+                         B2 = B2, 
+                         base = "knn", 
+                         estmethod = "samplesplit")
+
+rp_knn_ec <- RPEnsembleClass(RP.out = rp_knn_out, 
+                             n = n_train, 
+                             n.val = n_val, 
+                             n.test = n_test,
+                             p1 = mean(YTrain_1 == 1), 
+                             samplesplit = TRUE, 
+                             alpha = RPalpha(rp_knn_out, Y = YVal_1, p1 = mean(YTrain_1 == 1)))
+
+print(paste("Val Acc:", mean(rp_knn_out[1:200, ] == YVal_1)))
+print(paste("Test Acc:", mean(rp_knn_out[201:700] == YTest_1)))
+print(paste("Test Acc:", mean(rp_knn_ec  == YTest_1)))
+
+
+
+#######
+
+
+
+
 
 d_range <- c(2, 5, 10)
 B1_range <- 10^(1:3)
