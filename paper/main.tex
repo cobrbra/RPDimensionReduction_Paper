@@ -338,12 +338,12 @@ Suppose we have access to $R(C_{A}^{\mathrm{Bayes}})$, for every $A$, then we wi
 
 \section{Simulations}
 \subsection{Risk versus discovery: an illustrative example}
-It is natural to ask under what circumstances we may recover a classifier that performs very well
+It is natural to ask under what circumstances we may recover a classifier that performs very well, but fails to discover the true subspace. To elucidate one example where the relationship between the performance of the base/ensembled classifiers and the discovery rate (power) is subtle, we return to the linear discriminant analysis setting. We restrict to two dimensions, so that $X$ has one 'signal' covariate and one 'noise' covariate. We may then directly control the signal-to-noise ratio via the variable $\Delta$. In Figure~\ref{fig:ChangingDelta} we investigate, by simulation, the effect of varying $\Delta$ on the expected power of a single choice of projection ($B_1 = 1$), when we use projections with $d=1$ and an LDA base classifier on a training set of 200 samples, with selection determined by empirical risk on the training set. 
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=4in]{../results/figures/ChangingDelta.png}
-    \caption{\textbf{A}: Component-aligned, axis-aligned; \textbf{B}: Not component-aligned, axis-aligned; \textbf{C}: Component-aligned, not axis-aligned; \textbf{D}: Not component-aligned, not axis-aligned.\label{fig:examplefigures}}
+    \caption{The relationship between signal-to-noise ratio and discovery rate.\label{fig:ChangingDelta}}
 \end{figure}
 
 \subsection{Known Subspace Dimension}
