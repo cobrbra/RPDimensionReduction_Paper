@@ -82,6 +82,176 @@ n_test <- 500
 # Train/test split
 ids <- tvt(n_train, n_val, n_test)
 
+## Simulation model 0
+# Simulate data
+simulated_data_0 <- RPModel(5, n = n_train + n_val + n_test, p = 10) 
+#normalise first two columns
+simulated_data_0$data$x[, 1:2] <- sqrt((1/(0.5 + 0.1^2))) * simulated_data_0$data$x[, 1:2]
+
+XTrain_0 <- simulated_data_0$data$x[ids$train, ]
+YTrain_0 <- simulated_data_0$data$y[ids$train]
+
+XVal_0 <- simulated_data_0$data$x[ids$val, ]
+YVal_0 <- simulated_data_0$data$y[ids$val]
+
+XTest_0 <- simulated_data_0$data$x[ids$test, ]
+YTest_0 <- simulated_data_0$data$y[ids$test]
+
+train_val_data_0 <- data.frame(cbind(rbind(XTrain_0, XVal_0), Y = c(YTrain_0, YVal_0)))
+
+# RPEnsemble Method: LDA
+decompose_lda_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 500, B2 = 50, d = 2, base = "LDA", estmethod = "samplesplit")
+
+reduce_lda_0_train <- RPReduce(XTrain = XTrain_0, YTrain = YTrain_0, reduced_dim = 2, XTest = rbind(XTrain_0, XVal_0), YTest = c(YTrain_0, YVal_0), d = 2, decomposition = decompose_lda_0) %>% 
+  mutate(Model = 0, method = "RP-LDA", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+reduce_lda_0_test <- RPReduce(XTrain = XTrain_0, YTrain = YTrain_0, reduced_dim = 2, XTest = XTest_0, YTest = YTest_0, d = 2, decomposition = decompose_lda_0) %>% 
+  mutate(Model = 0, method = "RP-LDA", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+# RPEnsemble Method: QDA
+decompose_qda_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 500, B2 = 50, d = 5, base = "QDA", estmethod = "samplesplit")
+
+reduce_qda_0_train <- RPReduce(XTrain = XTrain_1, YTrain = YTrain_1, reduced_dim = 2, XTest = rbind(XTrain_0, XVal_0), YTest = c(YTrain_0, YVal_0), d = 2, decomposition = decompose_qda_0) %>% 
+  mutate(Model = 0, method = "RP-QDA", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+reduce_qda_0_test <- RPReduce(XTrain = XTrain_0, YTrain = YTrain_0, reduced_dim = 2, XTest = XTest_0, YTest = YTest_0, d = 2, decomposition = decompose_qda_0) %>% 
+  mutate(Model = 0, method = "RP-QDA", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+# RPEnsemble Method: KNN
+decompose_knn_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 500, B2 = 50, d = 2, base = "knn", estmethod = "samplesplit")
+
+reduce_knn_0_train <- RPReduce(XTrain = XTrain_0, YTrain = YTrain_0, reduced_dim = 2, XTest = rbind(XTrain_0, XVal_0), YTest = c(YTrain_0, YVal_0), d = 2, decomposition = decompose_knn_0) %>% 
+  mutate(Model = 0, method = "RP-KNN", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+reduce_knn_0_test <- RPReduce(XTrain = XTrain_0, YTrain = YTrain_0, reduced_dim = 2, XTest = XTest_0, YTest = YTest_0, d = 2, decomposition = decompose_knn_0) %>% 
+  mutate(Model = 0, method = "RP-KNN", Y = YTest) %>% 
+  dplyr::select(-YTest)
+
+
+# SIR Method
+sir_0 <- dr(data = train_val_data_0, formula = as.formula(paste("Y ~ ", paste0("V", 1:10, collapse = "+"))), method = "sir", nslices = 2)
+
+reduce_sir_0_train <- as.matrix(train_val_data_0 %>% dplyr::select(-Y)) %*% sir_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = c(YTrain_0, YVal_0), Model = 0, method = "SIR") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+reduce_sir_0_test <- XTest_0 %*% sir_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = YTest_0, Model = 0, method = "SIR") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+# SAVE Method
+save_0 <- dr(data = train_val_data_0, formula = as.formula(paste("Y ~ ", paste0("V", 1:10, collapse = "+"))), method = "save", nslices = 2)
+
+reduce_save_0_train <- as.matrix(train_val_data_0 %>% dplyr::select(-Y)) %*% save_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = c(YTrain_0, YVal_0), Model = 0, method = "SAVE") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+reduce_save_0_test <- XTest_0 %*% save_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = YTest_0, Model = 0, method = "SAVE") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+# PHD method
+phd_0 <-  dr(data = train_val_data_0, formula = as.formula(paste("Y ~ ", paste0("V", 1:10, collapse = "+"))), method = "phd", nslices = 2)
+
+reduce_phd_0_train <- as.matrix(train_val_data_0 %>% dplyr::select(-Y)) %*% phd_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = c(YTrain_0, YVal_0), Model = 0, method = "PHD") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+reduce_phd_0_test <- XTest_0 %*% phd_0$evectors[, 1:2] %>% 
+  as.data.frame() %>% 
+  mutate(Dim_1 = Dir1, Dim_2 = Dir2, Y = YTest_0, Model = 0, method = "PHD") %>% 
+  dplyr::select(-c(Dir1, Dir2))
+
+# PCA Method
+decompose_pca_0 <- svd(rbind(XTrain_0, XVal_0))$v[, 1:2]
+colnames(decompose_pca_0) <- c("Dim_1", "Dim_2")
+
+reduce_pca_0_train <- as.matrix(train_val_data_0 %>% dplyr::select(-Y)) %*% decompose_pca_0 %>% 
+  as.data.frame() %>% 
+  mutate(Y = c(YTrain_0, YVal_0), Model = 0, method = "PCA")
+
+reduce_pca_0_test <- XTest_0 %*% decompose_pca_0 %>% 
+  as.data.frame() %>% 
+  mutate(Y = YTest_0, Model = 0, method = "PCA")
+
+# Get false discovery, power and classification statistics
+rp_lda_est_proj_0 <- decompose_lda_0$v[, 1:2] %*% t(decompose_lda_0$v[, 1:2])
+rp_qda_est_proj_0 <- decompose_qda_0$v[, 1:2] %*% t(decompose_qda_0$v[, 1:2])
+rp_knn_est_proj_0 <- decompose_knn_0$v[, 1:2] %*% t(decompose_knn_0$v[, 1:2])
+
+sir_est_proj_0 <- sir_0$evectors[, 1:2] %*% t(sir_0$evectors[, 1:2])
+save_est_proj_0 <- save_0$evectors[, 1:2] %*% t(save_0$evectors[, 1:2])
+phd_est_proj_0 <- phd_0$evectors[, 1:2] %*% t(phd_0$evectors[, 1:2])
+
+pca_est_proj_0 <- decompose_pca_0 %*% t(decompose_pca_0)
+
+true_proj_0 <- simulated_data_0$subspace %*% t(simulated_data_0$subspace)
+
+rp_lda_fdr_0 <- sum(diag((diag(10) -  true_proj_0) %*% rp_lda_est_proj_0)) / 8
+rp_lda_pw_0 <- sum(diag(true_proj_0 %*% rp_lda_est_proj_0)) / 2
+rp_lda_class_0 <- class::knn(train = (reduce_lda_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             test = (reduce_lda_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             cl = reduce_lda_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_lda_0_test$Y)}
+rp_qda_fdr_0 <- sum(diag((diag(10) -  true_proj_0) %*% rp_qda_est_proj_0)) / 8
+rp_qda_pw_0 <- sum(diag(true_proj_0 %*% rp_qda_est_proj_0)) / 2
+rp_qda_class_0 <- class::knn(train = (reduce_qda_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             test = (reduce_qda_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             cl = reduce_qda_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_qda_0_test$Y)}
+rp_knn_fdr_0 <- sum(diag((diag(10) -  true_proj_0) %*% rp_knn_est_proj_0)) / 8
+rp_knn_pw_0 <- sum(diag(true_proj_0 %*% rp_knn_est_proj_0)) / 2
+rp_knn_class_0 <- class::knn(train = (reduce_knn_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             test = (reduce_knn_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                             cl = reduce_knn_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_knn_0_test$Y)}
+
+sir_fdr_0 <- sum(diag((diag(10) - true_proj_0) %*% sir_est_proj_0)) / 8
+sir_pw_0 <- sum(diag(true_proj_0 %*% sir_est_proj_0)) / 2
+sir_class_0 <- class::knn(train = (reduce_sir_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          test = (reduce_sir_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          cl = reduce_sir_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_sir_0_test$Y)}
+save_fdr_0 <- sum(diag((diag(10) - true_proj_0) %*% save_est_proj_0)) / 8
+save_pw_0 <- sum(diag(true_proj_0 %*% save_est_proj_0)) / 2
+save_class_0 <- class::knn(train = (reduce_save_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                           test = (reduce_save_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                           cl = reduce_save_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_save_0_test$Y)}
+phd_fdr_0 <- sum(diag((diag(10) - true_proj_0) %*% phd_est_proj_0)) / 8
+phd_pw_0 <- sum(diag(true_proj_0 %*% phd_est_proj_0)) / 2
+phd_class_0 <- class::knn(train = (reduce_phd_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          test = (reduce_phd_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          cl = reduce_phd_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_phd_0_test$Y)}
+
+pca_fdr_0 <- sum((diag((diag(10) - true_proj_0) %*% pca_est_proj_0))) / 8
+pca_pw_0 <- sum(diag(true_proj_0 %*% pca_est_proj_0)) / 2
+pca_class_0 <- class::knn(train = (reduce_pca_0_train %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          test = (reduce_pca_0_test %>% dplyr::select(Dim_1, Dim_2) %>% as.data.frame()), 
+                          cl = reduce_pca_0_train$Y, k = 5) %>% 
+  {mean(. == reduce_pca_0_test$Y)}
+
+
+model_0_performance <- data.frame(Model = c("RP-LDA", "RP-QDA", "RP-KNN", "SIR", "SAVE", "PHD", "PCA"), 
+                                  Power = c(rp_lda_pw_0, rp_qda_pw_0, rp_knn_pw_0, sir_pw_0, save_pw_0, phd_pw_0, pca_pw_0),
+                                  False_Discovery = c(rp_lda_fdr_0, rp_qda_fdr_0, rp_knn_fdr_0, sir_fdr_0, save_fdr_0, phd_fdr_0, pca_fdr_0),
+                                  Accuracy = c(rp_lda_class_0, rp_qda_class_0, rp_knn_class_0, sir_class_0, save_class_0, phd_class_0, pca_class_0))
+
+write_tsv(model_0_performance, file = "results/model_0_performance.tsv")
+
+
+
 ## Simulation model 1
 # Simulate data
 simulated_data_1 <- RPModel(1, n = n_train + n_val + n_test, p = p) 
@@ -100,33 +270,6 @@ YTest_1 <- simulated_data_1$data$y[ids$test]
 train_val_data_1 <- data.frame(cbind(rbind(XTrain_1, XVal_1), Y = c(YTrain_1, YVal_1)))
 
 
-
-#####
-
-plot(colMeans(XTrain_1[YTrain_1 == 1, ]), col = c("green", rep("blue", 99)))
-plot(colMeans(XTrain_1[YTrain_1 == 2, ]), col = c("green", rep("blue", 99)))
-
-f_1 <- sum(YTrain_1 == 1)
-f_2 <- sum(YTrain_1 == 2)
-
-M <- f_1 * cov(XTrain_1[YTrain_1 == 1, ]) + f_2 * cov(XTrain_1[YTrain_1 == 2, ])
-vecs <- eigen(M)$vectors
-
-plot(vecs[, 1])
-plot(vecs[, 2])
-
-sirrr <- dr(data = as.data.frame(cbind(XTrain_1, Y = YTrain_1)), formula = as.formula(paste("Y ~ ", paste0("V", 1:100, collapse = "+"))), method = "sir", nslices = 2)
-plot(sirrr$evectors[, 1])
-plot(sirrr$evectors[, 2])
-
-plot(sirrr$evalues)
-
-#####
-
-
-
-
-
 # RPEnsemble Method: LDA
 decompose_lda_1 <- RPDecomposeA(XTrain = XTrain_1, YTrain = YTrain_1, XVal = XVal_1, YVal = YVal_1, B1 = 500, B2 = 50, d = 2, base = "LDA", estmethod = "samplesplit")
 
@@ -137,28 +280,6 @@ reduce_lda_1_train <- RPReduce(XTrain = XTrain_1, YTrain = YTrain_1, reduced_dim
 reduce_lda_1_test <- RPReduce(XTrain = XTrain_1, YTrain = YTrain_1, reduced_dim = 2, XTest = XTest_1, YTest = YTest_1, d = 2, decomposition = decompose_lda_1) %>% 
   mutate(Model = 1, method = "RP-LDA", Y = YTest) %>% 
   dplyr::select(-YTest)
-
-rp_lda_out <- RPParallel(XTrain = XTrain_1, 
-                           YTrain = YTrain_1, 
-                           XVal = XVal_1, 
-                           YVal = YVal_1,
-                           XTest = XTest_1, 
-                           d = 2, 
-                           B1 = 500, 
-                           B2 = 50, 
-                           base = "LDA", 
-                           estmethod = "samplesplit")
-
-rp_lda_ec <- RPEnsembleClass(RP.out = rp_lda_out, 
-                             n = n_train, 
-                             n.val = n_val, 
-                             n.test = n_test,
-                             p1 = mean(YTrain_1 == 1), 
-                             samplesplit = TRUE, 
-                             alpha = RPalpha(rp_lda_out, Y = YVal_1, p1 = mean(YTrain_1 == 1)))
-print(mean(rp_lda_ec == YTest_1))
-
-
 
 # RPEnsemble Method: QDA
 decompose_qda_1 <- RPDecomposeA(XTrain = XTrain_1, YTrain = YTrain_1, XVal = XVal_1, YVal = YVal_1, B1 = 500, B2 = 50, d = 5, base = "QDA", estmethod = "samplesplit")
