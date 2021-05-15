@@ -2,6 +2,7 @@ library(devtools)
 load_all("../../RPEnsemble/")
 library(tidyverse)
 library(latex2exp)
+library(cowplot)
 
 gen_data <- function(Delta, n1 = 100, n2 = NULL) {
   if (is.null(n2)) {
@@ -43,7 +44,19 @@ results <- results %>%
 write_tsv(results, "results/ChangingDelta.tsv")
 
 fig <- results %>% 
-  ggplot(aes(x = Delta, y = power, colour = B2)) + geom_smooth(se = FALSE) +
-  labs(x = TeX("$\\Delta"), y = "Power") + ylim(0.5, 1) + theme_minimal()
+  ggplot(aes(x = Delta, y = power, colour = B2)) + geom_line() +
+  labs(x = TeX("$\\Delta"), y = "Power") + ylim(0.5, 1) + theme_minimal() 
+ 
+sims <- rowMeans((rep(1, length(Delta_range)) %*% t(sin(1:1000)^2)) * (1 - pnorm(Delta_range %*% t(abs(cos(1:1000))) / 2)) * pnorm(Delta_range %*% t(abs(sin(1:1000))) / 2) +
+              (rep(1, length(Delta_range)) %*% t(cos(1:1000)^2)) * (1 - pnorm(Delta_range %*% t(abs(sin(1:1000))) / 2)) * pnorm(Delta_range %*% t(abs(cos(1:1000))) / 2) +
+               0.5 * (1 - pnorm(Delta_range %*% t(abs(sin(1:1000))) / 2)) * (1 - pnorm(Delta_range %*% t(abs(cos(1:1000))) / 2)) +
+               0.5 * pnorm(Delta_range %*% t(abs(sin(1:1000))) / 2) * pnorm(Delta_range %*% t(abs(cos(1:1000))) / 2))
 
-ggsave("results/figures/ChangingDelta.png", fig, width = 5, height = 5)
+sims_data <- data.frame(Delta = Delta_range, power = sims)
+
+sims_fig <- sims_data %>% 
+  ggplot(aes(x = Delta, y = power)) + geom_line() +
+  labs(x = TeX("$\\Delta"), y = "Power") + ylim(0.5, NA) + theme_minimal()
+  
+p <- plot_grid(fig, sims_fig, labels = "AUTO", rel_widths = c(1.5, 1))
+ggsave("results/figures/ChangingDelta.png", p, width = 10, height = 5)
