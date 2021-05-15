@@ -165,10 +165,10 @@ A variety of methods for estimation of the central subspace have been proposed. 
 - Dimensionality reduction via boosting? -\\
 
 \subsection{False discovery and power for dimension reduction}
-We use the definitions from \citet{taeb_false_2020} of false discovery and power for subspace discovery. In particular, given a target subspace $S^* \subset \mathbb{R}^p$, and an estimate subspace $\hat{S}$, we let the false discovery $FD$ be given by 
-\[FD = \mathrm{Trace} \big( (I_p - \Pi_{S^*})\Pi_{\hat{S}} \big) \]
+We use the definitions from \citet{taeb_false_2020} of false discovery and power for subspace discovery. In particular, given a target subspace $S^* \subset \mathbb{R}^p$ with $dim(S^*) = d^*$, and an estimate subspace $\hat{S}$, we let the false discovery rate $FDR$ be given by 
+\[FDR = \frac{\mathrm{Trace} \big( (I_p - \Pi_{S^*})\Pi_{\hat{S}} \big)}{p - d^*} \]
 and power
-\[PW = \mathrm{Trace} \big( \Pi_{S^*} \Pi_{\hat{S}} \big). \]
+\[PW = \frac{\mathrm{Trace} \big( \Pi_{S^*} \Pi_{\hat{S}} \big)}{d^*}. \]
 Here, $\Pi_{S^*}, \Pi_{\hat{S}}$ refer to projections onto $S^*$ and $\hat{S}$ respectively. 
 \subsection{Random-projection ensemble classification}
 We now describe random-projection ensemble classification as proposed by \citet{cannings_random-projection_2017}, a flexible tool which allows the use of a practitioner's favourite low-dimensional classifier. Random-projection ensemble classification will form the basis of our Let $X$ be a random vector taking values in $\mathcal{X} \subset \mathbb{R}^p$ from which we are attempting to predict a response $Y$ taking values in $\{0,1\}$. Furthermore suppose we are given $n$ observations of the pair, and denote our data $\mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We choose a $d$-dimensional base classifier $C$, and for any projection $A:\mathbb{R}^p \rightarrow \mathbb{R}^d$ denote by $C^A$ that classifier applied to the projected observations $AX$ (so the prediction $C^A(x) = C(Ax)$). We write $\mathcal{T}_n^A$ for the projected dataset $\{(Ax_1, y_1), (Ax_2, y_2), \dots, (Ax_n, y_n)\}$. Then we may let $C^A_{\mathcal{T}_n^A}$ denote the classifier trained on the projected dataset and acting as a classifier on $\mathbb{R}^p$. 
@@ -240,7 +240,7 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
     Set $b_2^* := \sargmin\limits_{b_2 = 1,\dots, B_2} (R^{A_{b_1,b_2}}_{\mathcal{T}_n})$\;
     Set $A_{b_1} := A_{b_1,b_2^*}$\;
     }
-    Compute $\Pi = \frac{1}{B_1}\sum\limits_{b_1}^{B_1}A_{b_1}^TA_{b_1}$\;
+    Compute $\Pi = \frac{1}{B_1}\sum\limits_{b_1 = 1}^{B_1}A_{b_1}^TA_{b_1}$\;
     Compute eigenvalue decomposition $\Pi = V\Lambda V^T$\;
     Output columns of $V$ as basis vectors\;
     Output diagonal elements of $\Lambda$ as weightings\; 
@@ -250,15 +250,79 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
 
 
 \section{Theoretical Analysis}
+    
+
 \tcnote{I think we should be able to say something about $\mathbf{E}(\Pi)$, where $\mathbf{E}$ denotes the average over the randomness in the projections only. And bound $\|\Pi - \mathbf{E}(\Pi)\|_{\mathrm{op}}$ and/or $\|\Pi - \mathbf{E}(\Pi)\|_{F}$ with high-probability. }
 
 \citep{paulin_efronstein_2016}
 
-% \subsection{Naive LDA }
-% \tcnote{write out Linear Discriminant Analysis (and why naive?)}
-% Suppose an LDA separation with independent covariates:
-% $$X\ | \ Y = 0 \sim N_p(\mathbf{\mu}_0, \sigma^2 I_p) $$
-% $$X\ | \ Y= 1 \sim N_p(\mathbf{\mu}_1,  \sigma^2 I_p) $$
+\subsection{Linear Discriminant Analysis}
+Suppose we have the following (canonical) model:
+\[
+X | \{Y = 1\} \sim N_p(\Delta/2 e_1, I_p); \quad X | \{Y = 0\} \sim N_p(-\Delta/2 e_1, I_p),
+\]
+where $e_1 = (1, 0, \ldots, 0)$ is the first Euclidean basis vector and $I_p$ denotes the $p$ by $p$ identity matrix, and $\pi_1 = \mathbb{P}(Y=1) = \mathbb{P}(Y=0) = 1/2$. The Bayes risk in this case is $\Phi(-\Delta/2)$, where $\Phi$ denotes the standard Normal distribution function. 
+
+Fix a ``projection" matrix $A: \mathbb{R}^p \rightarrow \mathbb{R}^d$, and write $A = (a_1, \ldots, a_p)$ for the columns of $A$. We have 
+\[
+AX | \{Y = 1\} \sim N_p(\Delta/2 a_1, AA^T); \quad AX | \{Y = 0\} \sim N_p(-\Delta/2 a_1, AA^T). 
+\] 
+Then the \emph{projected} Bayes risk is 
+\[
+R(C_{A}^{\mathrm{Bayes}}) = \Phi\Bigl(-\frac{\Delta}{2} \|(AA^T)^{-1/2} a_1 \| \Bigr).
+\]
+Heuristically, we see that good projections have $\|(AA^T)^{-1/2} a_1\|$ close to 1.  Suppose now that $d =1$, then $\|(AA^T)^{-1/2} a_1\| = \frac{|a_1|}{\|A\|}$. Note also that 
+\[   
+PW(A)   = \mathrm{tr}(\Pi_{e_1}\Pi_{A}) = \mathrm{tr}\Bigl(e_1e_1^T\frac{A^TA}{\|A\|^2}\Bigr)  =  \frac{a_1^2}{\|A\|^2}.
+\]  
+
+Now, for $B_2 \geq 1$, let $\mathbf{A}_1^T, \ldots, \mathbf{A}_{B_2}^T \stackrel{\mathrm{i.i.d}}{\sim} N_p(0, \frac{1}{p} I_p)$. Now write
+\[
+ \frac{|a_1|}{\|A\|} = \frac{A^T e_1 } {\|A\|} = \cos(\Theta(A^T, e_1)). 
+\] 
+We also have that $\frac{A^T}{\|A\|}$ is the leading eigenvector of $A^TA$, interpreting $e_1$ as the leading eigenvector of $e_1e_1^T$, we have that 
+\begin{align*}
+\sin\bigl(\Theta(A^T, e_1)\bigr) &\leq 2\Bigl\|\frac{A^TA}{\|A\|^2} -  e_1e_1^T\Bigr\|_{\mathrm{op} } 
+\\ & = \frac{ 2}{\|A\|^2} \bigl\| A^TA - \|A\|^2 e_1e_1^T \bigr\|_{\mathrm{op}} 
+\\ & = \frac{2}{\|A\|^2} \| (A^T - \|A\|e_1)(A + \|A\|e_1^T)\|_{\mathrm{op}} 
+\\ & = 2\Bigl\|\frac{A^T}{\|A\|} - e_1\Bigr\|\Bigl\|\frac{A^T}{\|A\|} + e_1\Bigr\| \leq 4 \Bigl\|\frac{A^T}{\|A\|} - e_1\Bigr\|.  
+\end{align*} 
+
+
+
+
+We are interested in 
+\begin{enumerate} 
+\item the distribution of 
+\[
+\min_{b_2 = 1, \ldots, B_2} \{ R(C_{\mathbf{A}_{b_2}}^{\mathrm{Bayes}})\} 
+\]
+\item the quantity
+\[
+\hat{R}_{\mathbf{A}_{b_2}} - R(C_{\mathbf{A}_{b_2}}^{\mathrm{Bayes}})
+\]
+where $\hat{R}$ is some estimator of the risk. 
+\item the quantity
+\[
+\min_{b_2 = 1, \ldots, B_2} \hat{R}_{\mathbf{A}_{b_2}} - \min_{b_2 = 1, \ldots, B_2} R(C_{\mathbf{A}_{b_2}}^{\mathrm{Bayes}})
+\]
+\item the distribution of $\mathbf{A}_{b^*_2}$, where 
+\[
+b^*_2 = \argmin_{b_2 = 1, \ldots, B_2}  \{ R(C_{\mathbf{A}_{b_2}}^{\mathrm{Bayes}})\} 
+\]
+\item the distribution of $\mathbf{A}_{\hat{b}_2}$, where 
+\[
+\hat{b}_2 = \argmin_{b_2 = 1, \ldots, B_2} \hat{R}_{\mathbf{A}_{b_2}} 
+\]
+\end{enumerate} 
+
+Suppose we have access to $R(C_{A}^{\mathrm{Bayes}})$, for every $A$, then we will pick the projection with the largest value of $\frac{a_1^2}{\|A\|^2}$. In other words 
+\[
+\argmin_{b_2 = 1, \ldots, B_2} \{ R(C_{\mathbf{A}_{b_2}}^{\mathrm{Bayes}})\} = \argmax_{b_2 = 1, \ldots, B_2} \{\cos^2(\Theta(\mathbf{A}_{b_2}^T, e_1))\} 
+\]
+
+
+
 
 % and further suppose that the classes are balanced ($\pi_0 = \pi_1 = \frac{1}{2}$). We have that the risk of the Bayes decision classifier $C^{A-\mathrm{Bayes}}$ for the projected data $AX$ has a boundary given by $\eta(\mathbf{x}) = 0$ where the function $\eta$ is
 % $$\eta(\mathbf{x}) = (A\mathbf{x} - \frac{A\mathbf{\mu}_0 + A\mathbf{\mu}_1}{2})^T(A\mu_1 - A\mu_0).$$
@@ -273,18 +337,65 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
 % We notice here that the bound grows weak quickly as the distance between $\mu_0$ and $\mu_1$ increases. This stands to reason, since when signal is clearer projections a long way from optimal may produce good classifiers. The 
 
 \section{Simulations}
+\subsection{Risk versus discovery: an illustrative example}
+It is natural to ask under what circumstances we may recover a classifier that performs very well
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=4in]{../results/figures/ChangingDelta.png}
+    \caption{\textbf{A}: Component-aligned, axis-aligned; \textbf{B}: Not component-aligned, axis-aligned; \textbf{C}: Component-aligned, not axis-aligned; \textbf{D}: Not component-aligned, not axis-aligned.\label{fig:examplefigures}}
+\end{figure}
 
 \subsection{Known Subspace Dimension}
 
-
-\jbnote{Power $\rightarrow$ power rate, accuracy $\rightarrow$ accuracy + bayes risk}
 We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. \\
 ~\\
-\textbf{Sparse class boundaries}\\
-First, we let 
+\textbf{Model 0: 'Doughnuts in Two Dimensions'} \\
+We consider random noise in 8 components, and concentric rings of membership to classes 0 and 1 in the first two dimensions (see figure). This ensures that within-class means and covariances are all matched. \\
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=4in]{../results/figures/doughnuts.png}
+    \caption{The first four components of data from model 0 (two signal, two noise).\label{fig:doughnuts}}
+\end{figure}
+
+\begin{table}
+  \caption{Simulation performance}
+  \label{sample-table}
+  \centering
+  \begin{tabular}{l|lll}
+    \toprule
+    & \multicolumn{3}{c}{Model 0}                  \\
+    \cmidrule(r){1-4}
+    Method     & Power     & FDR & Accuracy  \\
+   
+    \cmidrule(r){1-4}
+    RP-LDA & 0.0510 & 0.237  &   0.490\\
+    RP-QDA & 0.453 & 0.137 &  0.734 \\
+    RP-kNN & 0.994  & 0.00147 & 0.999\\
+    SIR & - &  - &  -  \\
+    SAVE & 0.164 & 0.210 & 0.470 \\
+    PHD & 0.172 & 0.207 &     0.502 \\
+    PCA & 0.207 & 0.198 & 0.508 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+~\\
+
+\noindent\textbf{Model 1: Sparse class boundaries}\\
+We let 
 \[X \ | \ \{Y = 0\} \sim \frac{1}{2}N_p(\mu_0, \Sigma) + \frac{1}{2}N_p(-\mu_0, \Sigma) \]
 \[X \ | \ \{ Y = 1\} \sim \frac{1}{2}N_p(\mu_1, \Sigma) + \frac{1}{2}N_p(-\mu_1, \Sigma). \]
-We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)^T$ and let $\Sigma = I_{100}$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary. \\
+We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)^T$ and let $\Sigma = I_{100}$. This model exhibits a setup in which a central subspace exists (of dimension $d^* = 2)$, but there is no good linear class boundary. We have Bayes risk given by $2\Phi(2)\Phi(-2)$, and projected risk given by 
+\[ PBR(A) = \mathbb{P}\Big( \big((\Sigma^{\frac{1}{2}}Z) \cdot n_1 > - \mu_0 \cdot n_1 \big)  \cap \big( (\Sigma^{\frac{1}{2}}Z) \cdot n_2 > - \mu_0 \cdot n_2 \big) \Big) \]
+where 
+\begin{align*}
+    n_1 & = A^T(A\Sigma A^T)^{-1}A(\mu_1 - \mu_0) \\
+    n_2 & = A^T(A \Sigma A^T)^{-1} (\mu_0 + \mu_1) \\
+    Z & \sim N(0, I_p).
+\end{align*}
+
 ~\\
 
 \begin{table}
@@ -295,17 +406,16 @@ We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)
     \toprule
     & \multicolumn{3}{c}{Model 1} & \multicolumn{3}{c}{Model 2}                     \\
     \cmidrule(r){1-7}
-    Method     & Power     & FD & Accuracy &  Power     & FD & Accuracy   \\
+    Method     & Power     & FDR & Accuracy &  Power     & FDR & Accuracy   \\
    
     \midrule
-    RP-LDA & 0.185 & 1.82  &  0.553 & 0.897 & 1.10 & 0.945 \\
-    RP-QDA & 1.65  & 0.350 & 0.899 & 0.902 & 1.10 & 0.945 \\
-    RP-kNN & 1.58  & 0.417 & 0.908 & 0.938 & 1.06 & 0.945 \\
-    SIR & 0.417 & 1.58 & 0.539 & 0.677 & 1.32 & 0.945 \\
-    SAVE & 1.42 & 0.575 & 0.882 & 1.07 & 0.931 & 0.931 \\
-    PHD & 1.23 & 0.765 & 0.867 & 0.0352 & 1.96 & 0.465 \\
-    PCA & 1.94 & 0.0593 & 0.93 & 0.997 & 1.00 & 0.940 \\
-    Lt-SNE & 0.0137 & 1.986 & 0.477 & 0.0589 & 1.94 & 0.581 \\
+    RP-LDA & 0.0354 & 0.0197  &  0.495 & 0.321 &   0.0213 & 0.963 \\
+    RP-QDA & 0.0639  & 0.0191 & 0.495 & 0.307 &    0.0214 & 0.950 \\
+    RP-kNN & 0.00621  & 0.0203 & 0.470 & 0.324 &   0.0209 & 0.959 \\
+    SIR & 0.493 &  0.0103 & 0.650 &  0.0903 &      0.0281 & 0.751 \\
+    SAVE & 0.931 & 0.00140 & 0.878 & 0.0983 &      0.0279 & 0.717 \\
+    PHD & 0.896 & 0.00211 & 0.869 & 0.0353 &       0.0298 & 0.654 \\
+    PCA & 0.0132 & 0.0201 & 0.493 & 0.619 &        0.0118 & 0.950 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -318,7 +428,7 @@ We set $p=100$, $\mu_0 = (2, -2, 0, \ldots, 0)^T$, $\mu_1 = (2, 2, 0, \ldots, 0)
 % ~\\
 
 
-\textbf{Rotated sparse normal}\\
+\noindent\textbf{Model 2: Rotated sparse normal}\\
 Here,
 
 \[X \ | \ \{Y = 0\} \sim N_p(\Omega_p\mu_0, \Omega_p \Sigma_0 \Omega_p^T)  \] 
