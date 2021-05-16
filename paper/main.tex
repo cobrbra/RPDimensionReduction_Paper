@@ -338,7 +338,7 @@ Suppose we have access to $R(C_{A}^{\mathrm{Bayes}})$, for every $A$, then we wi
 
 \section{Simulations}
 \subsection{Risk versus discovery: an illustrative example}
-It is natural to ask under what circumstances we may recover a classifier that performs very well, but fails to discover the true subspace. To elucidate one example where the relationship between the performance of the base/ensembled classifiers and the discovery rate (power) is subtle, we return to the linear discriminant analysis setting. We restrict to two dimensions, so that $X$ has one 'signal' covariate and one 'noise' covariate. We may then directly control the signal-to-noise ratio via the variable $\Delta$. In Figure~\ref{fig:ChangingDelta} we investigate, by simulation, the effect of varying $\Delta$ on the expected power of a single choice of projection ($B_1 = 1$), when we use projections with $d=1$ and an LDA base classifier on a training set of 200 samples, with selection determined by empirical risk on the training set. 
+It is natural to ask under what circumstances we may recover a classifier that performs very well, but fails to discover the true subspace. To elucidate one example where the relationship between the performance of the base/ensembled classifiers and the discovery rate (power) is subtle, we return to the linear discriminant analysis setting. We restrict to two dimensions, so that $X$ has one 'signal' covariate and one 'noise' covariate. We may then directly control the signal-to-noise ratio via the parameter $\Delta$. In Figure~\ref{fig:ChangingDelta} we investigate, by simulation, the effect of varying $\Delta$ on the average power of a single choice of projection ($B_1 = 1$), when we use projections with $d=1$ and an LDA base classifier on a training set of 200 samples, with selection determined by empirical risk on the training set. 
 
 \begin{figure}[htbp]
     \centering
@@ -346,6 +346,28 @@ It is natural to ask under what circumstances we may recover a classifier that p
     \caption{The relationship between signal-to-noise ratio and discovery rate.\label{fig:ChangingDelta}}
 \end{figure}
 
+We see that, as expected, too low a signal-to-noise ratio $\Delta$ leads to low-powered projections. We also, perhaps less immediately obviously, see that too high a signal-to-noise ratio results in a weakened ability to discriminate good from bad projections (as all projections begin to offer effective classifiers). The important takeaway is that it is not the performance of base classifiers that determines high-powered discovery, but rather how strongly the performance of those classifiers depends on selecting good projections. 
+
+For a (very) simple case, we can begin to pick apart what's going on. Suppose, as above, we have 2-dimensional $X$ following an LDA model. Suppose we have access to an infinite training set (i.e for each projection $A$ we form the Bayes classifier $C_A^{\text{Bayes}}$), but only one validation example. Furthermore, suppose we restrict to $B_2$ = 2, but also impoose that our $d=1$ dimensional projections are not only normalised, but orthogonal. In particular, we may write $A_1^T = (\cos(\theta), \sin(\theta)), A_2^T = (-\sin(\theta), \cos(\theta))$, where $\theta$ will be chosen uniformly from $[0, 2\pi)$. Given our validation sample $(X, Y)$, we have
+\begin{align*}
+    \hat{R}_1 & = \mathbbm{1}\{ A_1X \geq 0, Y = 0 \} + \mathbbm{1}\{ A_1X \leq 0, Y = 1 \} \\
+    \hat{R}_2 & = \mathbbm{1}\{ A_2X \geq 0, Y = 0 \} + \mathbbm{1}\{ A_2X \leq 0, Y = 1 \}
+\end{align*}
+Since $A_1X$ is independent of $A_2X$ (due to the orthogonality of $A_1, A_2$), we can compute 
+\begin{align*}
+    \mathbb{P}(\hat{R}_1 \geq \hat{R}_2) & = (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big) \\
+    \mathbb{P}(\hat{R}_1 \leq \hat{R}_2) & = \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) %\\
+    % \mathbb{P}(\hat{R}_1 = \hat{R}_2) & = (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) + 
+    % \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)
+\end{align*}
+from which we compute the expected power of the selected projection $A_* = A_{\argmin \{ \hat{R}_i\}}$ as 
+\begin{align*}
+\mathbb{E}[PW(A_*)] = & \mathbb{E}_{\theta \sim \text{Unif}[0, 2\pi)}[\cos^2(\theta) (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)\\ 
+ &+ \sin^2(\theta) \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big) \\
+ &+ \frac{1}{2} \Big( (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) + 
+    \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big) \Big)].  
+    \end{align*}
+We plot this curve in Figure~\ref{fig:} -- note the similarity to Figure~\ref{fig:ChangingDelta}.
 \subsection{Known Subspace Dimension}
 
 We present two simulation studies, of distributions with known central subspaces, and compare our method with other techniques for supervised dimension reduction. \\
@@ -437,19 +459,19 @@ Here,
 where $\Sigma_p$ is a random $p\times p$ rotation. We choose $\mu_0 = (3, 3, 3, 0, \ldots, 0)$ and $\mu_1 = (0, \ldots, 0)$, while $\Sigma_0$ and $\Sigma_1$ are block diagonal
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=6in]{../results/figures/sim_evs.png}
-    \caption{Caption}
-    \label{fig:sim_evs}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=6in]{../results/figures/sim_evs.png}
+%     \caption{Caption}
+%     \label{fig:sim_evs}
+% \end{figure}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=6in]{../results/figures/sim_rvs.png}
-    \caption{Caption}
-    \label{fig:sim_rvs}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=6in]{../results/figures/sim_rvs.png}
+%     \caption{Caption}
+%     \label{fig:sim_rvs}
+% \end{figure}
 
 \subsection{Unknown Subspace Dimension}
 
