@@ -112,18 +112,18 @@ We propose a class of algorithms for \glsxtrlong{sdr} based on ensembles of rand
 \subsection{Terminology and Basic Concepts}
 We will be discussing supervised classification methods. By supervised, we mean that we are presented with labelled training data 
 \[ \mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n) \ | \ x_i \in \mathcal{X}, y_i \in \mathcal{Y}\}. \]
-We refer to $\mathcal{X}$ as the 'input space' or 'observation space', and will assume it is a subset of real Euclidean space so that $\mathcal{X} \subset \mathbb{R}^p$. We refer to $\mathcal{Y}$ as the 'outcome space' or 'label space', and assume for simplicity that $\mathcal{Y} = \{0,1\}$. The elements of $\mathcal{T}_n$ can be considered as observations of a random variable $(X,Y)$ from a joint probability distribution $P_{X \times Y}$, although in some circumstances it will be more convenient to think of the values $x_i$ as fixed. We define a classifier as a measurable function $C: \mathcal{X} \rightarrow \mathcal{Y}$, and denote by $\mathcal{C}_{\mathcal{X},\mathcal{Y}}$ the space of all such functions (note that this is identical for regression apart from the set $\mathcal{Y}$ and the measure used). A learning procedure is a function $L : \mathcal(\mathcal{X} \times \mathcal{Y})^n \rightarrow \mathcal{C}_{\mathcal{X},\mathcal{Y}}$, i.e. a map from training data sets to classifiers. When the learning procedure used is clear (or irrelevant) we will write $C_{\mathcal{T}_n} = L(\mathcal{T}_n)$ to refer to a classifier trained on the given training data. Common learning procedures for classification include linear and quadratic discriminant analysis, $k$-nearest neighbours, logistic regression, support vector machines and random forests. 
+We refer to $\mathcal{X}$ as the 'input space' or 'observation space', and will assume it is a subset of real Euclidean space so that $\mathcal{X} \subset \mathbb{R}^p$. We refer to $\mathcal{Y}$ as the 'outcome space' or 'label space', and assume for simplicity that $\mathcal{Y} = \{0,1\}$. The elements of $\mathcal{T}_n$ can be thought of as independent observations of a random variable $(X,Y)$ from a joint probability distribution $P_{X \times Y}$, although in some circumstances it will be more convenient to think of the values $x_i$ or the pairs $(x_i, y_i)$ as fixed. We define a classifier as a measurable function $C: \mathcal{X} \rightarrow \mathcal{Y}$, and denote by $\mathcal{C}_{\mathcal{X},\mathcal{Y}}$ the space of all such functions. A learning procedure is a measurable function $L : \mathcal(\mathcal{X} \times \mathcal{Y})^n \rightarrow \mathcal{C}_{\mathcal{X},\mathcal{Y}}$, i.e. a map from training data sets to classifiers. When the learning procedure used is clear (or irrelevant) we will write $C_{\mathcal{T}_n} = L(\mathcal{T}_n)$ to refer to a classifier trained on the given training data. Common learning procedures for classification include linear and quadratic discriminant analysis, $k$-nearest neighbours, logistic regression, support vector machines and random forests. 
 
 We can measure the performance of a classifier via its risk, given by 
 \[R(C) = \mathbb{E}_{(X,Y)}[\mathbbm{1}_{\{C(X) \neq Y\}}] \quad \Big( = \int_{\mathcal{X}\times \mathcal{Y}} \mathbbm{1}_{\{C(X) \neq Y\}} dP_{X\times Y}\Big).\]
-Note that this definition has a close analogy with regression risk, in which the discrete distance $\mathbbm{1}_{\{C(X) \neq Y \}}$ is replaced by the $L_2$ distance $||C(X)-Y||_2^2$. In practice the quantity $R(C)$ is often intractable, and we have to estimate it with a random variable $\hat{R}$. Choices for $\hat{R}$ include the training error $\hat{R}(C) := \frac{1}{n}\sum_{(x,y) \in \mathcal{T}_n} \mathbbm{1}_{\{C(x) \neq y\}}$, or the test error 
-\[\hat{R}(C) = \frac{1}{m} \sum_{(x,y) \in \mathcal{T}_{m}} \mathbbm{1}_{\{C(x) \neq y\}},\] 
-where unseen observation-outcome pairs come from a second dataset $\mathcal{T}_{m} = \{(x_i, y_i) \ | \ 1 \leq i \leq m \}$.
+In practice the quantity $R(C)$ is often unavailable or intractable, and we have to replace it with an empirical estimate $\hat{R}$. Typically $\hat{R}$ is of the form
+\[\hat{R}(C) = \frac{1}{n'} \sum_{(x,y) \in \mathcal{T}_{n'}'} \mathbbm{1}_{\{C(x) \neq y\}},\] 
+where the dataset $\mathcal{T}_{n'}'$ is chosen be the original training set $\mathcal{T}_n$ (training error) or some previously unseen dataset (test/validation error).
 
 All of the methods mentioned above suffer from a phenomenon known as the curse of dimensionality when $p$ is large \citep{mai_review_2013}. Loosely put, the curse of dimensionality refers to the observation that the volume of a region of space (such as a hypercube) increases exponentially with $p$, necessitating an exponential increase in sample size to maintain the same density of observations and so predictive performance. This is true even when dimensionality $p$ and sample size $n$ increase together at the same rate with $p<n$ (for a thorough treatment see \citet{wainwright_high-dimensional_2019}), but is particularly exacerbated when $p \gg n$. In this regime overfitting becomes very difficult to manage. In this situation it is common to make some assumption of lower dimensional structure. Common practices for imposing lower dimensional structure include sample clustering and variable selection. Both can be implemented in a variety of ways and are liable to fail in certain situations, as we shall discuss in the next section.
 
 \subsection{Dimension Reduction and Variable Selection}
-Discovering a low-dimensional structure to a high-dimensional dataset is extremely helpful for producing good classifiers, but is also a valuable goal in its own right: low-dimensional representations of data are often very useful for interpretation and visualisation in their own right. One approach is to apply a clustering procedure to the observation data (without consideration of the associated labels). This can be done using a variety of methods such as Principal Component Analysis (PCA) and t-SNE. While clustering in this way has been extremely useful for a variety of applications, there is often no \textit{a priori} reason to assume that the directions of greatest variation in a dataset will necessarily correspond to the direct of greatest variation of the response variable. As an illustration of this principle, consider subplots \textbf{A} and \textbf{B} in Figure \ref{fig:examplefigures}. For simplicity we observations with only two components, but it is easy to see how these patterns could be embedde into higher dimensional spaces. Subplot \textbf{A} illustrates the ideal configuration for pre-processing dimensionality reduction: the direction of greatest variation aligns perfectly with the direction encoding the most information about the label. Situations that look like this, broadly speaking, are very accommodating to clustering via PCA followed by learning of a lower dimensional (in this case one-dimensional) classifier. An obvious counterexample to this trend is given in subplot \textbf{B}: here this is a clear principal component and a clear direction encodintg all available information about the label, but they are not at all aligned. Were we to extract a one-dimensional subspace via PCA here, we would observe no clear pattern with respect to our label of interest. 
+Discovering some low-dimensional structure to a high-dimensional dataset is extremely helpful for producing good classifiers, but is also a valuable goal in its own right: low-dimensional representations of data are often very useful for interpretation and visualisation. One approach is to apply a clustering procedure to the observation data (without consideration of the associated labels). This can be done using a variety of methods such as Principal Component Analysis (PCA) and t-SNE. While clustering in this way has been extremely useful for a variety of applications, there is often no \textit{a priori} reason to assume that the directions of greatest variation in a dataset will necessarily correspond to the direct of greatest variation of the response variable. As an illustration of this principle, consider subplots \textbf{A} and \textbf{B} in Figure \ref{fig:examplefigures}. For simplicity we observations with only two components, but it is easy to see how these patterns could be embedde into higher dimensional spaces. Subplot \textbf{A} illustrates the ideal configuration for pre-processing dimensionality reduction: the direction of greatest variation aligns perfectly with the direction encoding the most information about the label. Situations that look like this, broadly speaking, are very accommodating to clustering via PCA followed by learning of a lower dimensional (in this case one-dimensional) classifier. An obvious counterexample to this trend is given in subplot \textbf{B}: here this is a clear principal component and a clear direction encodintg all available information about the label, but they are not at all aligned. Were we to extract a one-dimensional subspace via PCA here, we would observe no clear pattern with respect to our label of interest. 
 
 Another broad class of dimensionality reduction techniques can be grouped under the banner of variable selection. These include methods based on model comparison statistics (e.g. Aikake Information Criterion, Bayesian Information Criterion), sparsity-enforcing regularisation (e.g. Lasso) and stability selection. These are, broadly speaking, motivated by the assumption that there exists some subset $S^* \subset \{1,\dots,p\}$ of the components of the input space $\mathcal{X}$ containing all available information about the labels. The output of such methods will typically be a set $\bar{S}$ estimating $S^*$. These methods perform well when the true lower-dimensional structure of the data aligns well with the axes of the observation space, but are not rotationally invariant. Lower dimensional structure along any other direction may not be well expressed via projection to some subset of axes, as illustrated in subplot $\textbf{C}$. This issue becomes more severe with higher dimensionality. Finally, both of the properties discussed may be true as illustrated in \textbf{D}. In this example, while a clear one dimensional structure exists, even embedded in two dimensions no combination of clustering and variable selection will provide a good lower-dimensional representation. 
 
@@ -165,11 +165,12 @@ A variety of methods for estimation of the central subspace have been proposed. 
 - Dimensionality reduction via boosting? -\\
 
 \subsection{False discovery and power for dimension reduction}
-We use the definitions from \citet{taeb_false_2020} of false discovery and power for subspace discovery. In particular, given a target subspace $S^* \subset \mathbb{R}^p$ with $dim(S^*) = d^*$, and an estimate subspace $\hat{S}$, we let the false discovery rate $FDR$ be given by 
-\[FDR = \frac{\mathrm{Trace} \big( (I_p - \Pi_{S^*})\Pi_{\hat{S}} \big)}{p - d^*} \]
-and power
-\[PW = \frac{\mathrm{Trace} \big( \Pi_{S^*} \Pi_{\hat{S}} \big)}{d^*}. \]
-Here, $\Pi_{S^*}, \Pi_{\hat{S}}$ refer to projections onto $S^*$ and $\hat{S}$ respectively. 
+We use equivalent definitions to those in \citet{taeb_false_2020} for power and false discovery rate. In particular, given a target subspace $S^* \subset \mathbb{R}^p$ with $\text{dim}(S^*) = d^*$, and a projection $A$, we define
+\begin{align*}
+PW(A) & = \frac{\mathrm{tr} \big( \Pi_{S^*} A^TA)}{d^*}. \\
+FDR(A) & = \frac{\mathrm{tr} \big( (I_p - \Pi_{S^*}) A^TA\big)}{p - d^*}
+\end{align*}
+where $\Pi_{S^*} \in \mathbb{R}^{p \times p}$ refers to the dimension-preserving map onto the subspace $S^*$.
 \subsection{Random-projection ensemble classification}
 We now describe random-projection ensemble classification as proposed by \citet{cannings_random-projection_2017}, a flexible tool which allows the use of a practitioner's favourite low-dimensional classifier. Random-projection ensemble classification will form the basis of our Let $X$ be a random vector taking values in $\mathcal{X} \subset \mathbb{R}^p$ from which we are attempting to predict a response $Y$ taking values in $\{0,1\}$. Furthermore suppose we are given $n$ observations of the pair, and denote our data $\mathcal{T}_n = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We choose a $d$-dimensional base classifier $C$, and for any projection $A:\mathbb{R}^p \rightarrow \mathbb{R}^d$ denote by $C^A$ that classifier applied to the projected observations $AX$ (so the prediction $C^A(x) = C(Ax)$). We write $\mathcal{T}_n^A$ for the projected dataset $\{(Ax_1, y_1), (Ax_2, y_2), \dots, (Ax_n, y_n)\}$. Then we may let $C^A_{\mathcal{T}_n^A}$ denote the classifier trained on the projected dataset and acting as a classifier on $\mathbb{R}^p$. 
 
@@ -248,7 +249,11 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
  \caption{Random Projection Subspace Estimation\label{alg:rpsubspace}}
 \end{algorithm} 
 
+\subsection{Resampling the validation set}
+Revisiting the form of the estimator $R^{A_{b_1b_1}}_{\mathcal{T}_n}$, we have assumed so far that, when estimating the risk associated with a classifier/projection, we will keep a fixed training/validation split throughout our analysis. However, this utilises our training data in an asymmetric fashion and risks overfitting to the features of the chosen validation set. We may implement another strategy, whereby rather than using a fixed split we randomly choose a validation set for each value of $b_1$.
 
+
+\subsection{A note on data normalisation: axis aligned vs. non-axis aligned}
 \section{Theoretical Analysis}
     
 
@@ -257,16 +262,18 @@ Note that while $\Pi$ is not a true projection (in general $\Pi \neq \Pi^2$), it
 \citep{paulin_efronstein_2016}
 
 \subsection{General Case}
-For a projection $A$, let our risk estimate be given by $\hat{R}_A$, where $\hat{R}_A$ takes values in a set $\mathcal{R}$ (for example we may have for validation error $\mathcal{R} = \{0, \frac{1}{n_{\text{val}}}, \frac{2}{n_{\text{val}}}, \ldots, 1 \} $). We assume that $\mathcal{R}$ is finite\footnote{\jbnote{I don't think finite's necessary but pah}} and has at least two distinct values $r_1, r_2 \in \mathcal{R}$ such that $\mathbb{P}(\hat{R}_A = r_i) \neq 0$. We then define the function\footnote{\jbnote{This is expectation over random A, but I don't know how to bold blackboard bold.}} 
-\[ \rho(r) := \mathbb{E}[PW(A) | \hat{R}_A = r]. \]
-If $\rho$ is strictly decreasing, then for $B2 > 1$:
-\[ \mathbb{E}[PW(A_{b_1^*})] > \mathbb{E}[PW(A_{b_1b_2})]. \]
-This is since
-\begin{align*}
-    
-\end{align*}
-
-
+For a projection $A$, let our risk estimate be given by $\hat{R}_A$, where $\hat{R}_A$ takes values in a set $\mathcal{R}$ (for example we may have for validation error $\mathcal{R} = \{0, \frac{1}{n_{\text{val}}}, \frac{2}{n_{\text{val}}}, \ldots, 1 \} $). We assume that $\mathcal{R}$ is finite, writing $\mathcal{R} = \{r_1, \dots, r_{|\mathcal{R}|}$\}, and contains at least two distinct values $r_i, r_j \in \mathcal{R}$ such that $\mathbf{P}(\hat{R}_A = r_i), \mathbf{P}(\hat{R}_A = r_j) \neq 0$. We then define the function 
+\[ \rho_d(r) := \mathbf{E}[PW(A) | \hat{R}_A = r], \]
+where the expectation is over matrices $A \in \mathbb{R}^{d\times p}$ such that $AA^T = I_d$, distributed according to Haar measure. Where $d$ is fixed we will refer simply to $\rho(r)$.
+We'll see that $\rho$ determines the relationship between the risk of projected classifiers (important for ensemble classification) and the power of their associated subspaces (important for subspace estimation/dimension reduction). In general, we will ask that $\rho$ be strictly decreasing, so that decreasing the empirical risk of a classifier corresponds to an increase in subspace discovery. If this is true, then we can immediately say a few things. Firstly, for $B_2 > 1$ we have that
+\begin{equation} \label{eq:increasedpower}
+\mathbf{E}[PW(A_{b_1})] > \mathbf{E}[PW(A_{b_1b_2})],
+\end{equation}
+which simply says that performing empirical risk-based selection will on average produce a higher powered projection than a random choice. The same argument gives us that increasing $B_2$ will always lead to greater expected power. We can also say what happens when $B_2$ becomes very large:
+\begin{equation} \label{eq:infiniteb2}
+   \lim_{B_2 \rightarrow \infty} \mathbf{E}[PW(A_{b_1})] = \rho^* := \max_{\substack{r \in \mathcal{R}  \\ \mathbf{P}(\hat{R}_A = r)\neq 0}} \rho(r) 
+\end{equation}
+One important point to emphasise is that this relies on the $\hat{R}_A$s being independent -- this is satisfied for empirical risk elements based on constant training or validation sets, but not where the validation set is re-sampled upon each iteration of $b_1$. If re-sampling works well, this may be a key consideration.
 
 \subsection{Linear Discriminant Analysis}
 Suppose we have the following (canonical) model:
@@ -367,8 +374,8 @@ We can begin to pick apart what's going on by focusing in on an even simpler cas
 \end{align*}
 Since $A_1X$ is independent of $A_2X$ (due to the orthogonality of $A_1, A_2$), we can compute 
 \begin{align*}
-    \mathbb{P}(\hat{R}_1 \geq \hat{R}_2) & = (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big) \\
-    \mathbb{P}(\hat{R}_1 \leq \hat{R}_2) & = \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) %\\
+    \mathbb{P}(\hat{R}_1 > \hat{R}_2) & = (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big) \\
+    \mathbb{P}(\hat{R}_1 > \hat{R}_2) & = \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) %\\
     % \mathbb{P}(\hat{R}_1 = \hat{R}_2) & = (1 - \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))(1-\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)) + 
     % \Phi\big(\frac{\Delta}{2}|\cos\theta|\big))\Phi\big(\frac{\Delta}{2}|\sin\theta|\big)
 \end{align*}
@@ -415,7 +422,11 @@ We consider random noise in 8 components, and concentric rings of membership to 
   \end{tabular}
 \end{table}
 
-~\\
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=5in]{../results/figures/Model0Changingp.png}
+    \caption{Changing the dimensionality of the observation vector in model 0.\label{fig:Model-Changingp}}
+\end{figure}
 
 \noindent\textbf{Model 1: Sparse class boundaries}\\
 We let 
@@ -495,7 +506,47 @@ where $\Sigma_p$ is a random $p\times p$ rotation. We choose $\mu_0 = (3, 3, 3, 
 
 
 \section*{Appendix}
+\subsection*{Proofs}
+\noindent \textbf{Equation \ref{eq:increasedpower}} \\
+This is since
+\begin{align*}
+    \mathbf{E}[PW(A_{b_1})]  & = \mathbf{E}[\rho(\hat{R}_{A_{b_1}})] \\
+    & = \sum_{i = 1}^{|\mathcal{R}|} w_i \mathbf{P}(\rho(\hat{R}_{A_{b_1}}) \geq \rho(r_i)) \\
+    & = \sum_{i = 1}^{|\mathcal{R}|} w_i \mathbf{P}(\hat{R}_{A_{b_1}} \leq r_i) \quad \text{(by strict monotonicity of $\rho$)}\\
+    & > \sum_{i = 1}^{|\mathcal{R}|} w_i \mathbf{P}(\hat{R}_{A_{b_1b_2}} \leq r_i)  \quad \text{(since $A_{b_1}$ has been chosen to minimise $\hat{R}$)} \\
+    & = \mathbf{E}[\rho(\hat{R}_{A_{b_1b_2}})] \\
+    & = \mathbf{E}[PW(A_{b_1b_2})] \quad \big(= \frac{d}{p} \ \big),
+\end{align*}
 
+where $w_i = \sum_{j = 1}^i (-1)^{i-j}\rho(r_{|\mathcal{R}| + 1 - j})$ and we have chosen to enumerate $\mathcal{R}$ such that $r_1 < r_2 < \dots < r_{|\mathcal{R}|}$, so that $w_i>0$ for all $i  \in \{1, \dots, \mathcal{|R|}\}$. 
+\bigskip \\
+\noindent \textbf{Equation \ref{eq:infiniteb2}} \\
+Let $r^* = \min \{r \in \mathcal{R}: \mathbf{P}(\hat{R}_{A_{b_1}{b_2}}= r ) \neq 0 \}$, and $q = 1 - \mathbf{P}(\hat{R}_{A_{b_1b_2}} = r^*)$. First note that
+
+\begin{align*}
+    \mathbf{P}(\hat{R}_{A_{b_1}} = r^*) & = \mathbf{P}(\bigcup_{\substack{b2 = 1}}^{B_2} \{ \hat{R}_{A_{b_1b_2}} = r^*\} )\\
+    & = 1 - \mathbf{P}(\bigcap_{\substack{b_2 = 1}}^{B_2} \{\hat{R}_{A{b_1b_2}} \neq r^* \} ) \\
+    & = 1 - \prod_{\substack{b_2 = 1}}^{B_2} \mathbf{P}(\hat{R}_{A_{b_1b_2}} \neq r^*) \\
+    & = 1 - q^{B_2}.
+\end{align*}
+
+Then, bounding our target from below: 
+\begin{align*}
+    \mathbf{E}[PW(A_{b_1})]  & = \mathbf{E}[PW(A_{b_1})|\hat{R}_{A_{b_1}} = r^*] \mathbf{P}(\hat{R}_{A_{b_1}} = r^*) \\
+    & + \mathbf{E}[PW(A_{b_1})|\hat{R}_{A_{b_1}} \neq r^*] \mathbf{P}(\hat{R}_{A_{b_1}} \neq r^*) \\
+    & \geq \rho^* (1-q^{B_2})
+    \end{align*}
+and above:
+\begin{align*}
+    \mathbf{E}[PW(A_{b_1})]  & = \mathbf{E}[PW(A_{b_1})|\hat{R}_{A_{b_1}} = r^*] \mathbf{P}(\hat{R}_{A_{b_1}} = r^*) \\
+    & + \mathbf{E}[PW(A_{b_1})|\hat{R}_{A_{b_1}} \neq r^*] \mathbf{P}(\hat{R}_{A_{b_1}} \neq r^*) \\
+    & = \rho^*(1-q^{B_2}) + q^{B_2}\sum_{\substack{r \in \mathcal{R} \\ r \neq r^*}}\rho(r) \mathbf{P}(\hat{R}_{A_{b_1}} = r | \hat{R}_{A_{b_1}} \neq r^*) \\
+    & \leq \rho^*(1-q^{B_2}) + \rho^*q^{B_2} \sum_{\substack{r \in \mathcal{R} \\ r \neq r^*}}\mathbf{P}(\hat{R}_{A_{b_1}} = r | \hat{R}_{A_{b_1}} \neq r^*) \\
+    & = \rho^*,
+\end{align*}
+we have that $\rho^*(1- q^{B_2}) \leq \mathbf{E}[PW(A_{b_1})] \leq \rho^*$ for all $B_2$. The result follows from noting that, by assumption, $q \in (0,1)$.
+    
+    
 
 \bibliographystyle{plainnat}
 \bibliography{references.bib}
