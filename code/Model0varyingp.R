@@ -7,12 +7,12 @@ library(latex2exp)
 set.seed(1234)
 n_train <- 800
 n_val <- 200
-n_test <- 500
+n_test <- 0
 
 # Train/test split
 ids <- tvt(n_train, n_val, n_test)
-ps <- seq(5, 50, 5)
-n_trials <- 10
+ps <- seq(5, 50, 15)
+n_trials <- 5
 pw_knn <- matrix(0, n_trials, length(ps))
 pw_save <- matrix(0, n_trials, length(ps))
 
@@ -31,9 +31,12 @@ for (p_index in 1:length(ps)) {
     
     XTest_0 <- simulated_data_0$data$x[ids$test, ]
     YTest_0 <- simulated_data_0$data$y[ids$test]
+    
     train_val_data_0 <- data.frame(cbind(rbind(XTrain_0, XVal_0), Y = c(YTrain_0, YVal_0)))
     
-    decompose_knn_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 500, B2 = 50, d = 2, base = "knn", estmethod = "samplesplit")
+    
+    #decompose_knn_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 50, B2 = 50, d = 2, base = "knn", estmethod = "samplesplit")
+    decompose_knn_0 <- RPDecomposeA(XTrain = rbind(XTrain_0, XVal_0), YTrain = c(YTrain_0, YVal_0), B1 = 50, B2 = 50, d = 2, base = "knn", estmethod = "randomsplit")
     save_0 <- dr(data = train_val_data_0, formula = as.formula(paste("Y ~ ", paste0("V", 1:p, collapse = "+"))), method = "save", nslices = 2)
     true_proj_0 <- simulated_data_0$subspace %*% t(simulated_data_0$subspace)
     est_proj_knn_0 <- decompose_knn_0$v[, 1:2] %*% t(decompose_knn_0$v[, 1:2])
