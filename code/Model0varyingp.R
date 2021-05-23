@@ -11,8 +11,8 @@ n_test <- 0
 
 # Train/test split
 ids <- tvt(n_train, n_val, n_test)
-ps <- seq(5, 50, 15)
-n_trials <- 5
+ps <- seq(4, 30, 2)
+n_trials <- 10
 pw_knn <- matrix(0, n_trials, length(ps))
 pw_save <- matrix(0, n_trials, length(ps))
 
@@ -36,7 +36,7 @@ for (p_index in 1:length(ps)) {
     
     
     #decompose_knn_0 <- RPDecomposeA(XTrain = XTrain_0, YTrain = YTrain_0, XVal = XVal_0, YVal = YVal_0, B1 = 50, B2 = 50, d = 2, base = "knn", estmethod = "samplesplit")
-    decompose_knn_0 <- RPDecomposeA(XTrain = rbind(XTrain_0, XVal_0), YTrain = c(YTrain_0, YVal_0), B1 = 50, B2 = 50, d = 2, base = "knn", estmethod = "randomsplit")
+    decompose_knn_0 <- RPDecomposeA(XTrain = rbind(XTrain_0, XVal_0), YTrain = c(YTrain_0, YVal_0), B1 = 200, B2 = 50, d = 2, base = "knn", estmethod = "randomsplit")
     save_0 <- dr(data = train_val_data_0, formula = as.formula(paste("Y ~ ", paste0("V", 1:p, collapse = "+"))), method = "save", nslices = 2)
     true_proj_0 <- simulated_data_0$subspace %*% t(simulated_data_0$subspace)
     est_proj_knn_0 <- decompose_knn_0$v[, 1:2] %*% t(decompose_knn_0$v[, 1:2])
@@ -60,6 +60,8 @@ fig <- powers %>%
              ymin = mean_power - sd_power, ymax = mean_power + sd_power)) + 
   geom_point() + geom_errorbar(size = 0.1, alpha = 0.3) + 
   theme_minimal() + labs(x = TeX("$p$"), y = "Power") + 
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank()) + 
+  geom_line(aes(x = seq(2, 30, length.out = 280), 2 / seq(2, 30, length.out = 280)), colour = "black", linetype = 2)
+
 
 ggsave("results/figures/Model0Changingp.png", fig, width = 7, height = 5)
